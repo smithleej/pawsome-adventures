@@ -28,6 +28,30 @@ for(let i=0;i<12;i++){const x=-12+(i%3)*1.25,z=-24-Math.floor(i/3)*1.9;
  ball(.5,hedge,x,.6,z,scene,[1.1,.9,1.2])}
 for(let i=0;i<8;i++){const x=7+(i%4)*.9,z=-29-Math.floor(i/4)*1.5;
  ball(.33,leaf,x,.4,z);ball(.13,mat(i%2?0xf5d16d:0xff9fa5),x,.8,z)}
+// Lightweight garden detail pass: small flower clusters, soft grass and path edging.
+// Use shared materials and disable decorative shadows to keep mobile performance stable.
+const gardenLilac=mat(0xbca5e4),gardenPeach=mat(0xffb48d),gardenCream=mat(0xffedb1),gardenGrass=mat(0x63b06a);
+const detailFlowers=[gardenLilac,gardenPeach,gardenCream];
+for(const [cx,cz] of [[-8,8],[7,8],[-9,-3],[10,-15],[-8,-29],[10,-32]]){
+ // Each cluster has three flowers and a low leaf mound, well away from the main walkway.
+ const mound=ball(.39,leaf,cx,.16,cz,scene,[1.35,.45,.9]);mound.castShadow=false;
+ for(let j=0;j<3;j++){
+  const a=j*Math.PI*2/3,fx=cx+Math.cos(a)*.32,fz=cz+Math.sin(a)*.29;
+  const stalk=cylinder(.035,.04,.35,gardenGrass,fx,.31,fz);stalk.castShadow=false;
+  const blossom=ball(.115,detailFlowers[(j+Math.abs(Math.round(cx)))%3],fx,.54,fz,scene,[1.25,.5,1.25]);blossom.castShadow=false;
+  const core=ball(.047,gardenCream,fx,.6,fz);core.castShadow=false;
+ }
+}
+// Rounded stones gently frame the trail rather than obstructing it.
+for(let k=0;k<10;k++){
+ const z=10-k*4.4,x=(k%2?-3.65:3.65);
+ const pebble=ball(.2,stone,x,.07,z,scene,[1.5,.4,.9]);pebble.castShadow=false;
+}
+// Short grasses give the open lawn more depth without dense geometry.
+for(let k=0;k<18;k++){
+ const x=(k%2?-1:1)*(5.4+(k%3)*2.1),z=9-Math.floor(k/2)*5.0;
+ const tuft=ball(.18,gardenGrass,x,.12,z,scene,[.55,.85,1.3]);tuft.castShadow=false;
+}
 // Sprinklers cycle on and off. Players can avoid the jets or run through them slowly.
 const sprinklers=[{x:0,z:-12.2,phase:0},{x:1.6,z:-21.2,phase:1.7}].map(sp=>{
  const base=cylinder(.16,.2,.65,stone,sp.x,.35,sp.z);
