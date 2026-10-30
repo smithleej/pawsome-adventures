@@ -52,6 +52,35 @@ for(let k=0;k<18;k++){
  const x=(k%2?-1:1)*(5.4+(k%3)*2.1),z=9-Math.floor(k/2)*5.0;
  const tuft=ball(.18,gardenGrass,x,.12,z,scene,[.55,.85,1.3]);tuft.castShadow=false;
 }
+// Small area-identity pass: shared materials, no new collisions or particle systems.
+const marshGreen=mat(0x6c9876),lilyGreen=mat(0x59a26a),pondBloom=mat(0xffe0ed),hedgeGlow=mat(0xffd67f),gardenBlue=mat(0x91cbd8);
+// Pond: reeds at the shoreline, flat lily pads and a pair of pastel blooms.
+for(const [x,z] of [[6.1,-1.8],[11.6,1.9],[8.1,-3.0]]){
+ for(const offset of [-.13,.14]){
+  const reed=cylinder(.035,.047,.75,marshGreen,x+offset,.4,z);reed.castShadow=false;
+  const tip=ball(.07,wood,x+offset,.84,z,scene,[.7,1.4,.7]);tip.castShadow=false;
+ }
+}
+for(const [x,z] of [[8.4,.9],[9.7,-1.2],[10.2,.55]]){
+ const pad=cylinder(.38,.38,.035,lilyGreen,x,.13,z);pad.castShadow=false;
+ const flower=ball(.13,pondBloom,x,.23,z,scene,[1,.65,1]);flower.castShadow=false;
+}
+// Sprinkler lawn: small glistening puddles and decorative blue pebbles.
+for(const [x,z] of [[-2.6,-13.6],[3.7,-19.8],[-2,-22.1]]){
+ const puddle=cylinder(.64,.64,.018,gardenBlue,x,.012,z);puddle.castShadow=false;
+ const highlight=ball(.15,white,x-.25,.03,z+.12,scene,[1.5,.12,.5]);highlight.castShadow=false;
+}
+// Grove: low mushrooms and lantern-like flowers along the far hedgerow.
+for(const [x,z] of [[-11,-27],[-9.5,-30],[10,-31]]){
+ const stalk=cylinder(.1,.12,.35,stone,x,.22,z);stalk.castShadow=false;
+ const cap=ball(.24,hedgeGlow,x,.45,z,scene,[1.3,.55,1.3]);cap.castShadow=false;
+}
+// Entrance: two colorful decorative planters identify the starting area.
+for(const [x,z] of [[-5.6,10.2],[5.6,10.2]]){
+ const pot=cylinder(.43,.34,.48,mat(0xd99873),x,.24,z);pot.castShadow=false;
+ const foliage=ball(.47,leaf,x,.63,z);foliage.castShadow=false;
+ const blossom=ball(.17,rose,x,.94,z);blossom.castShadow=false;
+}
 // Sprinklers cycle on and off. Players can avoid the jets or run through them slowly.
 const sprinklers=[{x:0,z:-12.2,phase:0},{x:1.6,z:-21.2,phase:1.7}].map(sp=>{
  const base=cylinder(.16,.2,.65,stone,sp.x,.35,sp.z);
