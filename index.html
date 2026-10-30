@@ -3,9 +3,9 @@
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,sans-serif;touch-action:none;background:#a5d6ed}canvas{display:block}#hud{position:fixed;inset:0;pointer-events:none;color:#233b30}#top{position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;gap:8px;align-items:center;justify-content:space-between} .pill{background:#fffdf0e8;border:2px solid #ffffff;border-radius:24px;padding:8px 12px;font-weight:800;box-shadow:0 3px 12px #0002;font-size:13px}#area{position:absolute;top:198px;left:50%;transform:translateX(-50%);background:#ffffffc9;border-radius:14px;padding:4px 10px;font-size:11px;font-weight:800}#objective{position:absolute;top:155px;left:50%;transform:translateX(-50%);background:#233b30dd;color:#fff;border:1px solid #ffffff88;border-radius:16px;padding:6px 11px;font-size:12px;font-weight:700;text-align:center;max-width:90vw}#progress{position:absolute;top:111px;left:50%;transform:translateX(-50%);width:max-content;max-width:94vw;display:flex;gap:5px;flex-wrap:wrap;justify-content:center}#progress span{font-size:11px;background:#fffdf0dd;border-radius:14px;padding:5px 8px;font-weight:750;box-shadow:0 2px 6px #0002}#progress span.done{background:#bdf1c8;color:#155d2c}#progress span.next{outline:2px solid #e6ac45}#message{position:absolute;top:62px;left:50%;transform:translateX(-50%);background:#fffef2ed;padding:9px 15px;border-radius:15px;text-align:center;max-width:min(90vw,540px);font-size:13px;font-weight:700;box-shadow:0 3px 12px #0002}button{font:inherit;border:0;cursor:pointer;touch-action:none}#switcher{position:absolute;bottom:calc(15px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:5px;pointer-events:auto;background:#ffffffb8;padding:5px;border-radius:20px}#switcher button{padding:8px 9px;border-radius:15px;background:#fff;color:#294b38;font-size:11px;font-weight:800;border:2px solid transparent}#switcher button.active{border-color:#2e965e;background:#d8ffdf}#joystick{position:absolute;bottom:calc(22px + env(safe-area-inset-bottom));left:20px;width:116px;height:116px;border-radius:100%;background:#ffffff55;border:3px solid #ffffffa8;pointer-events:auto;touch-action:none}#nub{position:absolute;width:49px;height:49px;border-radius:50%;background:#ffffffe6;box-shadow:0 2px 8px #0003;left:31px;top:31px}#actions{position:absolute;right:16px;bottom:calc(25px + env(safe-area-inset-bottom));display:flex;align-items:end;gap:10px;pointer-events:auto}#actions button{border-radius:50%;background:#fffdf0e8;color:#31553b;font-weight:900;border:3px solid #fff;box-shadow:0 4px 12px #0002;width:72px;height:72px;font-size:12px}#actions #ability{width:84px;height:84px;background:#ffe19b}#overlay{position:fixed;inset:0;background:#193e32b8;display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}#panel{background:#fffdf2;border-radius:26px;padding:24px;max-width:470px;text-align:center;box-shadow:0 16px 50px #0004}#panel h1{margin:0 0 10px;color:#2c6e4a}#panel p{line-height:1.5}#start{background:#38a96b;color:white;border-radius:18px;padding:14px 26px;font-weight:900;font-size:18px}#help{font-size:12px;color:#54695d}@media(max-width:620px){#area{top:177px;font-size:10px}#objective{top:139px;font-size:10px;padding:5px 8px}#progress{top:102px}#progress span{font-size:9px;padding:4px 6px}#message{top:58px;font-size:11px}#switcher{bottom:calc(5px + env(safe-area-inset-bottom))}#switcher button{font-size:10px;padding:6px}#joystick{width:96px;height:96px;bottom:calc(15px + env(safe-area-inset-bottom));left:10px}#nub{left:23px;top:23px}#actions{right:8px;bottom:calc(15px + env(safe-area-inset-bottom));gap:5px}#actions button{width:56px;height:56px;font-size:10px}#actions #ability{width:65px;height:65px}}
 </style></head><body><div id="hud"><div id="top"><div class="pill">🐾 Garden Dash</div><div class="pill" id="score">⭐ 0 / 12</div><div class="pill" id="secrets">🔎 0 / 4</div><div class="pill" id="who">Cracker</div></div><div id="message">Collect paws and use every pet's special power!</div><div id="progress" aria-label="Challenge progress"><span>Cracker ○</span><span>Charlie ○</span><span>Aurelia ○</span><span>Bonnie ○</span></div><div id="objective">Next: Cracker — reach the blue platform</div><div id="area">🌿 Welcome Garden</div><div id="joystick"><div id="nub"></div></div><div id="switcher"></div><div id="actions"><button id="jump">JUMP</button><button id="ability">POWER</button></div></div><div id="overlay"><div id="panel"><h1>🐾 Pawsome Adventures</h1><h2>Garden Dash</h2><p>Help Cracker, Charlie, Aurelia and Bonnie collect 12 golden paws, solve four linked pet challenges and open the garden gate! Explore the side paths for four optional hidden treasures — one for each pet.</p><p id="help">Move with the joystick or WASD / arrows. Jump with the button or Space. Cracker double-jumps with Space twice. Charlie crouches with E. Aurelia pushes crates by walking into them. Bonnie follows scents and digs with E. Switch pets with 1–4.</p><button id="start">Let's Play!</button></div></div><script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
-const scene=new THREE.Scene();scene.background=new THREE.Color(0xbce8fb);scene.fog=new THREE.Fog(0xbce8fb,32,80);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xb4ddfa);scene.fog=new THREE.Fog(0xcce6e6,40,90);
 const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,100);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xffffff,0x8db57d,2));const sun=new THREE.DirectionalLight(0xfff4d7,2.1);sun.position.set(-8,16,9);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-26;sun.shadow.camera.right=26;sun.shadow.camera.top=32;sun.shadow.camera.bottom=-25;scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xfff8eb,0x81ac8d,2.4));const sun=new THREE.DirectionalLight(0xffe7b1,2.3);sun.position.set(-8,16,9);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-26;sun.shadow.camera.right=26;sun.shadow.camera.top=32;sun.shadow.camera.bottom=-25;scene.add(sun);
 const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.85});const grass=mat(0x7fc477),pathMat=mat(0xdac298),wood=mat(0xa46c42),white=mat(0xffffff),black=mat(0x24262b),grey=mat(0x88939e),red=mat(0xb9622c),pink=mat(0xd9878c),gold=mat(0xffd13f),leaf=mat(0x4d9e58);
 function box(w,h,d,m,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}function ball(r,m,x,y,z,parent=scene,s=[1,1,1]){let o=new THREE.Mesh(new THREE.SphereGeometry(r,12,9),m);o.position.set(x,y,z);o.scale.set(...s);o.castShadow=true;parent.add(o);return o}function cylinder(r1,r2,h,m,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,12),m);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
 box(34,.3,54,grass,0,-.2,-12);box(6,.025,49,pathMat,0,-.025,-12);
@@ -50,8 +50,112 @@ function gardenSpeedMultiplier(){
  const onStone=steppingStones.some(v=>Math.hypot(position.x-v.x,position.z-v.z)<.55);
  return wet?.58:inPond&&!onStone?.7:1;
 }
+
+// Artistic detail layer: patchy ground, layered flowerbeds, garden props and gentle movement.
+const trimGreen=mat(0x4f9a62),darkGreen=mat(0x40845b),lightGreen=mat(0xa4d683),clay=mat(0xc78862),petalColors=[mat(0xffc46a),mat(0xf9a4bf),mat(0xddd0ff),mat(0xfff1aa)];
+const decorative=[];
+function petalFlower(x,z,c){
+ const stem=cylinder(.025,.03,.34,trimGreen,x,.17,z);
+ const center=ball(.07,petalColors[(c+3)%4],x,.39,z);
+ for(let k=0;k<5;k++){const a=k*Math.PI*2/5;ball(.085,petalColors[c%4],x+Math.cos(a)*.11,.39,z+Math.sin(a)*.11)}
+ decorative.push(center);
+}
+for(let i=0;i<135;i++){
+ const x=Math.sin(i*8.71)*14.1,z=Math.cos(i*5.39)*24-12;
+ if(Math.abs(x)<3.3||Math.hypot(x-9,z)<3.5||Math.abs(x+3)<1.8&&Math.abs(z-3)<2.2)continue;
+ if(i%3===0)petalFlower(x,z,i%4);
+ else {const tuft=ball(.14,i%2?trimGreen:lightGreen,x,.08,z,scene,[.45,.8,1.65]);tuft.rotation.y=i*1.6}
+}
+for(let i=0;i<22;i++){
+ const x=8+Math.sin(i*1.9)*2,z=-2+Math.cos(i*1.65)*2;
+ if(Math.hypot(x-9,z)<2.9)continue;
+ cylinder(.035,.045,.65,trimGreen,x,.32,z);
+ ball(.14,lightGreen,x,.64,z,scene,[.48,1.4,.55]);
+}
+for(let i=0;i<25;i++){
+ const x=Math.sin(i*9.27)*11.7,z=Math.cos(i*4.27)*23-11;
+ if(Math.abs(x)<3.4)continue;
+ ball(.18,stone,x,.09,z,scene,[1.25,.38,.85]);
+}
+// Garden furniture and playful toy props at the sides of the route.
+for(const [x,z] of [[-10,7],[10,-14]]){
+ box(2.4,.2,.65,wood,x,.72,z);box(2.4,.9,.16,wood,x,1.17,z+.35);
+ for(const dx of [-.9,.9]){box(.14,.72,.14,wood,x+dx,.35,z-.22);box(.14,.72,.14,wood,x+dx,.35,z+.22)}
+}
+for(const [x,z] of [[-7,8],[10,-17],[-9,-32]]){
+ cylinder(.65,.46,.7,clay,x,.35,z);
+ ball(.61,darkGreen,x,1,z,scene,[1.25,.65,1.1]);
+ for(let k=0;k<4;k++)petalFlower(x+Math.sin(k*1.57)*.32,z+Math.cos(k*1.57)*.32,k);
+}
+for(const [x,z,color] of [[-5,10,0xe58a6b],[7,5,0x7a9cdd],[10,-22,0xe9bf5a]]){
+ const toy=ball(.38,mat(color),x,.38,z);
+ const stripe=new THREE.Mesh(new THREE.TorusGeometry(.31,.055,8,16),white);stripe.rotation.x=Math.PI/2;stripe.position.set(x,.4,z);scene.add(stripe);
+}
+const clouds=[];
+for(let i=0;i<5;i++){
+ const g=new THREE.Group();g.position.set(-15+i*7,12+(i%2)*2,-34+(i%3)*9);
+ for(let j=-1;j<=1;j++)ball(.95,white,j*.85,0,0,g,[1.3,.55,.9]);
+ scene.add(g);clouds.push(g);
+}
+const butterflies=[];
+for(let i=0;i<9;i++){
+ const x=Math.sin(i*5.8)*11,z=Math.cos(i*4.1)*19-11;
+ if(Math.abs(x)<3)x+=5;
+ const g=new THREE.Group();
+ const colors=[petalColors[i%4],petalColors[(i+1)%4]];
+ for(const side of [-1,1]){let wing=ball(.19,colors[side<0?0:1],side*.22,0,0,g,[1.1,1.5,.22]);wing.rotation.z=side*.35}
+ ball(.06,ink,0,0,-.03,g,[.6,1.8,.6]);
+ g.position.set(x,1.5,z);scene.add(g);butterflies.push({g,x,z,phase:i*2.3});
+}
+function animateDecor(){
+ butterflies.forEach(b=>{b.g.position.x=b.x+Math.sin(time*.85+b.phase)*.36;b.g.position.y=1.45+Math.sin(time*2.7+b.phase)*.36;b.g.rotation.y=Math.sin(time*3+b.phase)*.22});
+ clouds.forEach((g,i)=>{g.position.x=-15+i*7+Math.sin(time*.12+i)*.6});
+}
+
 const names=['Cracker','Charlie','Aurelia','Bonnie'],descs=['Double jump','Climb & crawl','Super strength','Sniff & dig'];let pets=[];
-function pet(kind){const root=new THREE.Group(),isDog=kind>=2,coat=[black,grey,black,red][kind],size=kind===2?1.35:kind===3?1.12:kind===1?1.02:.91;root.scale.setScalar(size);let body=ball(.42,coat,0,.67,.12,root,[.83,.85,isDog?1.65:1.25]);let head=ball(.36,coat,0,1.07,-.42,root,[1,kind===1?1.05:1,isDog?1.13:1]);if(kind===0){ball(.25,white,0,.66,-.17,root,[.8,1,.42]);ball(.15,white,0,.99,-.74,root,[.75,.7,.25])}if(kind===1){ball(.31,grey,0,1.06,-.44,root,[1.1,1.1,1])}if(isDog){ball(.21,kind===2?black:red,0,.93,-.83,root,[.85,.65,1.35]);ball(.105,black,0,.99,-1.1,root,[1.2,.7,.8]);for(let s of [-1,1]){let ear=ball(.17,coat,s*.29,1.23,-.42,root,[.65,1.4,.85]);ear.rotation.z=s*.35}}else{for(let s of [-1,1]){let ear=new THREE.Mesh(new THREE.ConeGeometry(.17,.34,4),coat);ear.position.set(s*.24,1.39,-.44);ear.rotation.y=Math.PI/4;root.add(ear)}}for(let s of [-1,1]){ball(.055,mat(kind===1?0xe7bc56:0xe9df9d),s*.15,1.13,isDog?-.77:-.74,root);ball(.023,black,s*.15,1.13,isDog?-.819:-.786,root)}for(let x of [-.28,.28])for(let z of [-.22,.4]){ball(.13,coat,x,.27,z,root,[1,1.8,1]);if(kind===0)ball(.105,white,x,.12,z-.03,root,[1,.5,1])}let tail=ball(.11,coat,0,.79,isDog?.93:.72,root,[.8,.8,isDog?2.2:2.6]);tail.rotation.x=-.45;root.userData.tail=tail;root.position.set(0,0,9);scene.add(root);return root}
+// Soft, expressive toy-like animal models, retaining recognizable breed silhouettes.
+const cream=mat(0xfff3de),ink=mat(0x26212a),eyeWhite=mat(0xfff8ed),shine=new THREE.MeshBasicMaterial({color:0xffffff}),irisAmber=mat(0xa76a2a),irisGreen=mat(0x85b76a),nosePink=mat(0xc97982),noseDark=mat(0x393137),blush=mat(0xe8a8a5),foxCream=mat(0xf0c8a2);
+function pet(kind){
+ const root=new THREE.Group(),isDog=kind>=2,coat=[black,grey,black,red][kind];
+ const scale=[.96,1.03,1.33,1.13][kind];root.scale.setScalar(scale);
+ const body=ball(.43,coat,0,.69,.14,root,[.92,.89,isDog?1.82:1.35]);
+ const tummy=ball(.29,kind===0?white:kind===3?foxCream:coat,0,.65,-.21,root,[.82,.88,.48]);
+ // Oversized head, chubby cheeks, almond eye accents and tiny light catches.
+ const head=ball(.43,coat,0,1.17,-.46,root,[kind===1?1.15:1.04,1.05,isDog?1.02:1.0]);
+ for(const side of [-1,1]){
+   ball(.19,coat,side*.29,.96,-.73,root,[1.08,.68,.82]);
+   ball(.16,eyeWhite,side*.19,1.23,isDog?-.822:-.81,root,[.94,1.12,.52]);
+   ball(.103,kind===1?irisAmber:kind===0?irisGreen:irisAmber,side*.19,1.23,isDog?-.906:-.893,root,[.93,1.15,.42]);
+   ball(.061,ink,side*.19,1.232,isDog?-.948:-.93,root,[.8,1.13,.47]);
+   ball(.036,shine,side*.16,1.29,isDog?-.971:-.951,root,[1,.95,.4]);
+   ball(.025,blush,side*.35,1.055,-.802,root,[1.5,.58,.43]);
+ }
+ const muzzle=ball(isDog?.275:.15,kind===0?white:kind===3?foxCream:kind===1?cream:coat,0,1.015,isDog?-.88:-.855,root,isDog?[.77,.57,1.6]:[1.18,.65,.64]);
+ const nose=ball(isDog?.105:.088,isDog?noseDark:nosePink,0,1.075,isDog?-1.29:-.96,root,[1.22,.78,.65]);
+ // Subtle smiling muzzle, two cheek puffs.
+ for(const side of [-1,1])ball(.095,kind===0?white:kind===3?foxCream:coat,side*.115,.96,isDog?-1.08:-.885,root,[1.2,.68,.85]);
+ if(kind===0){ball(.21,white,0,.61,-.35,root,[.8,1.1,.46]);ball(.08,white,0,1.34,-.83,root,[.9,.68,.3])}
+ if(kind===1){ball(.31,grey,0,.58,-.25,root,[1.15,.83,.6])}
+ if(isDog){
+   for(const side of [-1,1]){const ear=ball(kind===2?.2:.18,coat,side*.38,1.37,-.4,root,[.73,1.48,.8]);ear.rotation.z=side*.29;root.userData['ear'+side]=ear}
+   if(kind===2){ball(.3,black,0,1.03,-.93,root,[1.25,.58,1.35]);ball(.13,grey,0,.55,-.49,root,[.65,.8,.3])}
+ }else{
+   for(const side of [-1,1]){
+     const ear=new THREE.Mesh(new THREE.ConeGeometry(kind===1?.19:.21,kind===1?.31:.4,5),coat);
+     ear.position.set(side*.32,1.58,-.49);ear.rotation.z=-side*.15;root.add(ear);
+     const inner=new THREE.Mesh(new THREE.ConeGeometry(.105,.22,5),pink);
+     inner.position.set(side*.32,1.58,-.657);inner.rotation.z=-side*.15;root.add(inner);
+   }
+ }
+ for(const x of [-.30,.30])for(const z of [-.25,.47]){
+   const leg=ball(.145,coat,x,.3,z,root,[1,1.4,1]);
+   ball(.155,kind===0?white:coat,x,.145,z-.06,root,[1.16,.62,1.3]);
+   for(let t=-1;t<=1;t++)ball(.012,kind===0?white:kind===3?foxCream:cream,x+t*.068,.11,z-.18,root);
+ }
+ const tail=ball(.12,coat,0,.83,isDog?1.03:.78,root,[.9,.85,isDog?2.5:2.8]);
+ tail.rotation.x=-.45;root.userData.tail=tail;root.userData.head=head;root.userData.body=body;
+ root.position.set(0,0,9);scene.add(root);return root;
+}
 for(let i=0;i<4;i++)pets.push(pet(i));let active=0;const switcher=document.getElementById('switcher');names.forEach((n,i)=>{let b=document.createElement('button');b.textContent=['🐈‍⬛','🐈','🐕‍🦺','🦮'][i]+' '+n;b.onclick=()=>switchPet(i);switcher.appendChild(b)});
 let position=new THREE.Vector3(0,0,9),velocityY=0,grounded=true,jumps=0,score=0,started=false,won=false,completed=[false,false,false,false],keys=new Set(),joy={x:0,y:0},time=0;const hud=document.getElementById('message');function say(s){hud.textContent=s}function switchPet(i){
  if(started&&!grounded){say('Land before switching pets!');return}
@@ -195,10 +299,10 @@ updateProgress();updateObjective();const cameraLook=new THREE.Vector3(0,1,6),clo
   position.y=platformTop;velocityY=0;grounded=true;jumps=0;
   if(active===0)finishChallenge(0,'Cracker landed on the raised platform!');
  }else if(position.y<=0){position.y=0;velocityY=0;grounded=true;jumps=0}
- else if(grounded&&previousY>=platformTop&&(!onPlatform||position.y>platformTop+.1)){grounded=false}tickChallenges(dt);collectSecrets();
+ else if(grounded&&previousY>=platformTop&&(!onPlatform||position.y>platformTop+.1)){grounded=false}tickChallenges(dt);collectSecrets();animateDecor();
  const area=position.z>1?'🌻 Welcome Garden':position.z>-12?'🌊 Lily Pond & Rose Arch':position.z>-24?'💦 Sprinkler Lawn':'🌳 Secret Hedge Grove';
  const areaEl=document.getElementById('area');if(areaEl.textContent!==area)areaEl.textContent=area;
- coins.forEach(c=>{if(c.taken)return;c.group.rotation.y+=dt*2.5;c.group.position.y=.85+Math.sin(time*3+c.group.position.z)*.14;if(Math.hypot(position.x-c.group.position.x,position.z-c.group.position.z)<.85){c.taken=true;scene.remove(c.group);score++;document.getElementById('score').textContent='⭐ '+score+' / 12';say('Golden paw collected! '+score+'/12');checkGate()}});updateObjective();if(gateOpen){gate.position.y=Math.min(4,gate.position.y+dt*2);if(position.z<-35.5){won=true;document.getElementById('overlay').style.display='flex';document.getElementById('panel').innerHTML='<h1>🏆 Garden Dash Complete!</h1><p>All 12 golden paws collected and every pet helped save the day! Optional secrets: '+secrets.filter(s=>s.taken).length+'/4</p><button id="again" style="background:#38a96b;color:white;border-radius:18px;padding:14px 26px;font-weight:900">Play Again</button>';document.getElementById('again').onclick=()=>location.reload()}}}pets.forEach((p,i)=>{p.position.copy(position);p.position.y+=Math.sin(time*10)*.025;p.userData.tail.rotation.x=-.45+Math.sin(time*8)*.3});const target=new THREE.Vector3(position.x,position.y+5.8,position.z+9.8);
+ coins.forEach(c=>{if(c.taken)return;c.group.rotation.y+=dt*2.5;c.group.position.y=.85+Math.sin(time*3+c.group.position.z)*.14;if(Math.hypot(position.x-c.group.position.x,position.z-c.group.position.z)<.85){c.taken=true;scene.remove(c.group);score++;document.getElementById('score').textContent='⭐ '+score+' / 12';say('Golden paw collected! '+score+'/12');checkGate()}});updateObjective();if(gateOpen){gate.position.y=Math.min(4,gate.position.y+dt*2);if(position.z<-35.5){won=true;document.getElementById('overlay').style.display='flex';document.getElementById('panel').innerHTML='<h1>🏆 Garden Dash Complete!</h1><p>All 12 golden paws collected and every pet helped save the day! Optional secrets: '+secrets.filter(s=>s.taken).length+'/4</p><button id="again" style="background:#38a96b;color:white;border-radius:18px;padding:14px 26px;font-weight:900">Play Again</button>';document.getElementById('again').onclick=()=>location.reload()}}}pets.forEach((p,i)=>{p.position.copy(position);p.position.y+=Math.sin(time*10)*.025;p.userData.tail.rotation.x=-.45+Math.sin(time*(i>=2?9:5)+i)*.38;p.userData.head.rotation.z=Math.sin(time*2.8+i)*.024});const target=new THREE.Vector3(position.x,position.y+5.8,position.z+9.8);
  camera.position.lerp(target,1-Math.exp(-3.5*dt));
  const lookTarget=new THREE.Vector3(position.x,position.y+1.1,position.z-3.7);
  cameraLook.lerp(lookTarget,1-Math.exp(-5*dt));
