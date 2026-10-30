@@ -29,7 +29,22 @@
 #start,#again{background:linear-gradient(125deg,#52bc76,#2e916c)!important;box-shadow:0 6px 0 #267454,0 12px 22px #285d423a;color:#fff!important;border-radius:20px}
 #help{font-size:12px;line-height:1.5;color:#556e5d;background:#e7f2df;padding:12px;border-radius:15px}
 @media(max-width:620px){#top{gap:3px} .pill{font-size:10px;padding:6px 8px}#message{max-width:94vw;padding:6px 10px}#progress{max-width:96vw;gap:3px}#progress span{padding:4px 5px}}
-</style></head><body><div id="hud"><div id="top"><div class="pill">🐾 Garden Dash</div><div class="pill" id="score">⭐ 0 / 12</div><div class="pill" id="secrets">🔎 0 / 4</div><div class="pill" id="who">Cracker</div></div><div id="message">Collect paws and use every pet's special power!</div><div id="progress" aria-label="Challenge progress"><span>Cracker ○</span><span>Charlie ○</span><span>Aurelia ○</span><span>Bonnie ○</span></div><div id="objective">Next: Cracker — reach the blue platform</div><div id="area">🌿 Welcome Garden</div><div id="joystick"><div id="nub"></div></div><div id="switcher"></div><div id="actions"><button id="jump">JUMP</button><button id="ability">POWER</button></div></div><div id="overlay"><div id="panel"><h1>🐾 Pawsome Adventures</h1><h2>Garden Dash</h2><p class="storylead">The Golden Garden is losing its sparkle. Four little heroes can bring it back!</p><p>Work together to wake four garden wonders, follow the golden paws, and open the magical gate. Four hidden keepsakes are waiting off the path, too.</p><p id="help">Move with the joystick or WASD / arrows. Jump with the button or Space. Cracker double-jumps with Space twice. Charlie crouches with E. Aurelia pushes crates by walking into them. Bonnie follows scents and digs with E. Switch pets with 1–4.</p><button id="start">Let's Play!</button></div></div><script type="module">
+</style></head><body><div id="hud"><div id="top"><div class="pill">🐾 Garden Dash</div><div class="pill" id="score">⭐ 0 / 12</div><div class="pill" id="secrets">🔎 0 / 4</div><div class="pill" id="who">Cracker</div></div><div id="message">Collect paws and use every pet's special power!</div><div id="progress" aria-label="Challenge progress"><span>Cracker ○</span><span>Charlie ○</span><span>Aurelia ○</span><span>Bonnie ○</span></div><div id="objective">Next: Cracker — reach the blue platform</div><div id="area">🌿 Welcome Garden</div><div id="joystick"><div id="nub"></div></div><div id="switcher"></div><div id="actions"><button id="jump">JUMP</button><button id="ability">POWER</button></div></div><div id="overlay"><div id="panel"><h1>🐾 Pawsome Adventures</h1><h2>Garden Dash</h2><p class="storylead">The Golden Garden is losing its sparkle. Four little heroes can bring it back!</p><p>Work together to wake four garden wonders, follow the golden paws, and open the magical gate. Four hidden keepsakes are waiting off the path, too.</p><p id="help">Move with the joystick or WASD / arrows. Jump with the button or Space. Cracker double-jumps with Space twice. Charlie crouches with E. Aurelia pushes crates by walking into them. Bonnie follows scents and digs with E. Switch pets with 1–4.</p><button id="start">Let's Play!</button></div></div><script>
+(function(){
+ function report(e){
+   const button=document.getElementById('start'),help=document.getElementById('help');
+   if(button && !button.onclick && help){
+     const detail=e&&e.message?e.message:e&&e.reason?String(e.reason):'An unexpected error';
+     help.textContent='The game could not initialize: '+String(detail).slice(0,180)+'. Please refresh or report this message.';
+     button.textContent='Loading problem';
+     button.disabled=true;
+   }
+ }
+ window.addEventListener('error',report);
+ window.addEventListener('unhandledrejection',report);
+})();
+</script>
+<script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
 const scene=new THREE.Scene();scene.background=new THREE.Color(0xc9ecf4);scene.fog=new THREE.Fog(0xc8e5e4,37,87);
 const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,100);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.27;renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(renderer.domElement);
