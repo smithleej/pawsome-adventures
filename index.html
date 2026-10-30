@@ -70,7 +70,7 @@ function makeGardenRibbon(width,m,y,variance=0){
    const x=cx+side*(width+Math.cos(z*.16)*.13)+bend;
    pts.push(x,y,z);uv.push((side+1)*.5,i/8);
   }
-  if(i>0){const k=(i-1)*2;indices.push(k,k+2,k+1,k+1,k+2,k+3)}
+  if(i>0){const k=(i-1)*2;indices.push(k,k+1,k+2,k+1,k+3,k+2)}
  }
  const g=new THREE.BufferGeometry();
  g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
@@ -129,8 +129,18 @@ for(let i=0;i<94;i++){
 }
 // Distinct garden areas. These decorations are outside mandatory challenge paths.
 const water=mat(0x68bed1),stone=mat(0xc6d2ba),rose=mat(0xe77796),hedge=mat(0x438f52);
-cylinder(3.1,3.1,.09,stone,9,.01,0);
-cylinder(2.75,2.75,.09,water,9,.055,0);
+// Pond: translucent turquoise water, pebble shoreline and floating blossom islands.
+const pondGround=cylinder(3.18,3.2,.09,stone,9,.01,0);
+pondGround.castShadow=false;
+const pondSurface=new THREE.Mesh(new THREE.CylinderGeometry(2.82,2.8,.04,64),
+ new THREE.MeshPhysicalMaterial({color:0x64c6d7,metalness:.08,roughness:.16,transparent:true,opacity:.91,clearcoat:.8,clearcoatRoughness:.18}));
+pondSurface.position.set(9,.09,0);pondSurface.receiveShadow=true;scene.add(pondSurface);
+const pondEdgeMaterial=mat(0xd6d4b9);
+for(let j=0;j<34;j++){
+ const a=j*Math.PI*2/34,r=3.0+Math.sin(j*3.4)*.12;
+ const rock=ball(.2+(j%4)*.018,pondEdgeMaterial,9+Math.cos(a)*r,.08,Math.sin(a)*r,
+ scene,[1.15,.48,.78]);rock.rotation.y=a;rock.castShadow=false;
+}
 const steppingStones=[];
 for(let i=0;i<7;i++){const a=i*Math.PI*2/7,x=9+Math.cos(a)*2,z=Math.sin(a)*2;
  steppingStones.push({x,z});cylinder(.47,.5,.17,stone,x,.15,z);
@@ -283,6 +293,71 @@ function animateStoryWorld(){
   ring.material.opacity=.42*(1-phase);
  }
  storyClouds.forEach(c=>c.g.position.x=c.x+Math.sin(time*.13+c.phase)*.6);
+}
+
+
+// A romantic trellis and willow corner give the pond a focal point.
+const vineGreen=mat(0x5a9b68),vineLight=mat(0x85c985),blossomCoral=mat(0xffb1bd),blossomLight=mat(0xffe3ab);
+for(const [x,z] of [[-6,-10.8],[6,-30.6]]){
+ const archCurve=new THREE.CatmullRomCurve3([
+  new THREE.Vector3(x-1.4,.1,z),new THREE.Vector3(x-1.4,2.65,z),
+  new THREE.Vector3(x,3.32,z),new THREE.Vector3(x+1.4,2.65,z),
+  new THREE.Vector3(x+1.4,.1,z)]);
+ const woodenArch=new THREE.Mesh(new THREE.TubeGeometry(archCurve,30,.13,8,false),barkWarm);
+ woodenArch.castShadow=true;scene.add(woodenArch);
+ const vine=new THREE.Mesh(new THREE.TubeGeometry(archCurve,40,.065,7,false),vineGreen);
+ vine.position.z=-.14;vine.castShadow=false;scene.add(vine);
+ for(let n=0;n<13;n++){
+  const p=archCurve.getPoint((n+.5)/14);
+  const leaf=ball(.14,vineLight,p.x,p.y,p.z-.15,scene,[1.3,.5,.86]);leaf.castShadow=false;leaf.rotation.z=n*.6;
+  if(n%3===0){const bloom=ball(.13,n%2?blossomCoral:blossomLight,p.x,p.y+.07,p.z-.28);bloom.castShadow=false}
+ }
+}
+// Flowering shrubs and rock clusters add silhouettes at several depths.
+const shrubColors=[mat(0x64ab6c),mat(0x7cc17e),mat(0x509665),mat(0xa4c879)];
+for(let i=0;i<34;i++){
+ const x=((i*37)%27)-13,z=10-((i*17)%47);
+ if(Math.abs(x)<4.1||Math.hypot(x-9,z)<3.3)continue;
+ const material=shrubColors[i%4],width=.48+(i%3)*.18;
+ for(let part=0;part<3;part++){
+  const o=ball(width,material,x+Math.sin(part*2.1)*.37,.46+(part%2)*.12,z+Math.cos(part*2.1)*.32,scene,[1.15,.7,1]);
+  o.castShadow=false;
+ }
+ if(i%3===0){for(let j=0;j<3;j++){
+  const b=ball(.13,blossomCoral,x+Math.sin(j*2)*.42,.86,z+Math.cos(j*2)*.33);b.castShadow=false
+ }}
+}
+// Fluttering pastel butterflies, plus floating motes that lend the air a magical quality.
+const butterflyColors=[mat(0xffc9de),mat(0xd8b5ff),mat(0xffe1a0),mat(0xa7dcd0)];
+const flutterers=[];
+for(let i=0;i<11;i++){
+ const g=new THREE.Group(),x=Math.sin(i*6.8)*10.6,z=8-(i*4.4)%43;
+ const wings=[];
+ for(const side of [-1,1]){
+  const wing=new THREE.Group();wing.position.x=side*.085;g.add(wing);
+  const upper=ball(.2,butterflyColors[i%4],side*.19,.09,0,wing,[.9,1.3,.3]);upper.castShadow=false;
+  const lower=ball(.12,butterflyColors[(i+1)%4],side*.12,-.12,0,wing,[1.1,1,.3]);lower.castShadow=false;
+  wings.push(wing);
+ }
+ const body=ball(.08,barkDark,0,0,0,g,[.55,1.9,.6]);body.castShadow=false;
+ g.position.set(x,1.35,z);scene.add(g);flutterers.push({g,wings,x,z,phase:i*1.73});
+}
+// Rounded stepping pebbles flank the main trail.
+const pebbleGeo=new THREE.IcosahedronGeometry(.28,1),pebbleMat=mat(0xc3c2ad);
+const softPebbles=new THREE.InstancedMesh(pebbleGeo,pebbleMat,100);
+for(let i=0;i<100;i++){
+ const z=12-i*.49,x=(i%2===0?-1:1)*(3.5+(i%5)*.19);
+ flowerDummy.position.set(x,.04,z);flowerDummy.rotation.set(0,i*.2,0);
+ flowerDummy.scale.set(.65+(i%4)*.16,.22,.75+(i%3)*.16);flowerDummy.updateMatrix();
+ softPebbles.setMatrixAt(i,flowerDummy.matrix);
+}
+softPebbles.castShadow=false;scene.add(softPebbles);
+function animateFlutterers(){
+ for(const b of flutterers){
+  b.g.position.set(b.x+Math.cos(time*.63+b.phase)*.58,1.4+Math.sin(time*2+b.phase)*.28,b.z+Math.sin(time*.72+b.phase)*.42);
+  b.g.rotation.y=Math.sin(time*.45+b.phase)*.36;
+  for(let j=0;j<2;j++)b.wings[j].rotation.y=(j===0?1:-1)*(.3+.7*Math.sin(time*13+b.phase));
+ }
 }
 
 const names=['Cracker','Charlie','Aurelia','Bonnie'],descs=['Double jump','Climb & crawl','Super strength','Sniff & dig'];let pets=[];
@@ -530,6 +605,21 @@ const gateZ=-35.5;box(3.6,3.1,.35,wood,-2.1,1.55,gateZ);box(3.6,3.1,.35,wood,2.1
 /* A single magical garden quest: each pet awakens a bloom and lights the exit arch. */
 const powerColors=[0x65c9f0,0xc9a2f3,0xffb967,0xf19c79];
 const gateArch=box(4.6,.32,.45,wood,0,3.25,gateZ);gateArch.castShadow=false;
+const archGold=mat(0xe9c77d),archTrim=mat(0xffecaf);
+const archCurve=new THREE.CatmullRomCurve3([
+ new THREE.Vector3(-2.2,2.6,gateZ+.2),new THREE.Vector3(-1.9,3.5,gateZ+.2),
+ new THREE.Vector3(0,4.13,gateZ+.2),new THREE.Vector3(1.9,3.5,gateZ+.2),
+ new THREE.Vector3(2.2,2.6,gateZ+.2)
+]);
+const flowerArch=new THREE.Mesh(new THREE.TubeGeometry(archCurve,42,.19,12,false),archGold);
+flowerArch.castShadow=true;scene.add(flowerArch);
+const bloomTrim=new THREE.Mesh(new THREE.TubeGeometry(archCurve,42,.06,8,false),archTrim);
+bloomTrim.position.z=.19;bloomTrim.castShadow=false;scene.add(bloomTrim);
+for(let j=0;j<11;j++){
+ const p=archCurve.getPoint(j/10);
+ const leaf=ball(.18,j%2?vineLight:blossomCoral,p.x,p.y+.08,p.z+.24,scene,[1,.78,.48]);
+ leaf.castShadow=false;
+}
 const gatePetals=[],gardenBlooms=[];
 for(let i=0;i<4;i++){
  const material=new THREE.MeshStandardMaterial({color:0x736655,emissive:powerColors[i],emissiveIntensity:0,roughness:.35});
@@ -621,7 +711,7 @@ updateProgress();updateObjective();const cameraLook=new THREE.Vector3(0,1,6),clo
   position.y=platformTop;velocityY=0;grounded=true;jumps=0;
   if(active===0)finishChallenge(0,'Cracker landed on the raised platform!');
  }else if(position.y<=0){position.y=0;velocityY=0;grounded=true;jumps=0}
- else if(grounded&&previousY>=platformTop&&(!onPlatform||position.y>platformTop+.1)){grounded=false}tickChallenges(dt);collectSecrets();animateStoryWorld();updateGardenMagic(dt);if(!gateOpen&&position.z<-32.8&&time>gateReminderAt){gateReminderAt=time+7;say('Gate locked: '+(12-score)+' paws and '+completed.filter(v=>!v).length+' challenges remaining.');}
+ else if(grounded&&previousY>=platformTop&&(!onPlatform||position.y>platformTop+.1)){grounded=false}tickChallenges(dt);collectSecrets();animateStoryWorld();animateFlutterers();updateGardenMagic(dt);if(!gateOpen&&position.z<-32.8&&time>gateReminderAt){gateReminderAt=time+7;say('Gate locked: '+(12-score)+' paws and '+completed.filter(v=>!v).length+' challenges remaining.');}
  const area=position.z>1?'🌻 Welcome Garden':position.z>-12?'🌊 Lily Pond & Rose Arch':position.z>-24?'💦 Sprinkler Lawn':'🌳 Secret Hedge Grove';
  const areaEl=document.getElementById('area');if(areaEl.textContent!==area)areaEl.textContent=area;
  coins.forEach(c=>{if(c.taken)return;c.group.rotation.y+=dt*2.5;c.group.position.y=.85+Math.sin(time*3+c.group.position.z)*.14;if(Math.hypot(position.x-c.group.position.x,position.z-c.group.position.z)<.85){c.taken=true;sparkleBurst(c.group.position.x,c.group.position.y,c.group.position.z);
