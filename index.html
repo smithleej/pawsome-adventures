@@ -15,7 +15,7 @@ for(let i=0;i<45;i++){let x=Math.sin(i*13.7)*14,z=Math.cos(i*9.1)*24-12;if(Math.
 const names=['Cracker','Charlie','Aurelia','Bonnie'],descs=['Double jump','Climb & crawl','Super strength','Sniff & dig'];let pets=[];
 function pet(kind){const root=new THREE.Group(),isDog=kind>=2,coat=[black,grey,black,red][kind],size=kind===2?1.35:kind===3?1.12:kind===1?1.02:.91;root.scale.setScalar(size);let body=ball(.42,coat,0,.67,.12,root,[.83,.85,isDog?1.65:1.25]);let head=ball(.36,coat,0,1.07,-.42,root,[1,kind===1?1.05:1,isDog?1.13:1]);if(kind===0){ball(.25,white,0,.66,-.17,root,[.8,1,.42]);ball(.15,white,0,.99,-.74,root,[.75,.7,.25])}if(kind===1){ball(.31,grey,0,1.06,-.44,root,[1.1,1.1,1])}if(isDog){ball(.21,kind===2?black:red,0,.93,-.83,root,[.85,.65,1.35]);ball(.105,black,0,.99,-1.1,root,[1.2,.7,.8]);for(let s of [-1,1]){let ear=ball(.17,coat,s*.29,1.23,-.42,root,[.65,1.4,.85]);ear.rotation.z=s*.35}}else{for(let s of [-1,1]){let ear=new THREE.Mesh(new THREE.ConeGeometry(.17,.34,4),coat);ear.position.set(s*.24,1.39,-.44);ear.rotation.y=Math.PI/4;root.add(ear)}}for(let s of [-1,1]){ball(.055,mat(kind===1?0xe7bc56:0xe9df9d),s*.15,1.13,isDog?-.77:-.74,root);ball(.023,black,s*.15,1.13,isDog?-.819:-.786,root)}for(let x of [-.28,.28])for(let z of [-.22,.4]){ball(.13,coat,x,.27,z,root,[1,1.8,1]);if(kind===0)ball(.105,white,x,.12,z-.03,root,[1,.5,1])}let tail=ball(.11,coat,0,.79,isDog?.93:.72,root,[.8,.8,isDog?2.2:2.6]);tail.rotation.x=-.45;root.userData.tail=tail;root.position.set(0,0,9);scene.add(root);return root}
 for(let i=0;i<4;i++)pets.push(pet(i));let active=0;const switcher=document.getElementById('switcher');names.forEach((n,i)=>{let b=document.createElement('button');b.textContent=['🐈‍⬛','🐈','🐕‍🦺','🦮'][i]+' '+n;b.onclick=()=>switchPet(i);switcher.appendChild(b)});
-let position=new THREE.Vector3(0,0,9),velocityY=0,grounded=true,jumps=0,score=0,started=false,won=false,completed=[false,false,false,false],keys=new Set(),joy={x:0,y:0},time=0;const hud=document.getElementById('message');function say(s){hud.textContent=s}function switchPet(i){active=i;document.querySelectorAll('#switcher button').forEach((b,j)=>b.classList.toggle('active',j===i));document.getElementById('who').textContent=names[i];document.getElementById('ability').textContent=descs[i].toUpperCase();say(names[i]+' — '+descs[i]);pets.forEach((p,j)=>p.visible=j===i)}switchPet(0);
+let position=new THREE.Vector3(0,0,9),velocityY=0,grounded=true,jumps=0,score=0,started=false,won=false,completed=[false,false,false,false],keys=new Set(),joy={x:0,y:0},time=0;const hud=document.getElementById('message');function say(s){hud.textContent=s}function switchPet(i){active=i;document.querySelectorAll('#switcher button').forEach((b,j)=>b.classList.toggle('active',j===i));document.getElementById('who').textContent=names[i];document.getElementById('ability').textContent=i===1?'CROUCH':i===3?'DIG':'AUTO';document.getElementById('ability').style.opacity=(i===1||i===3)?'1':'.45';say(names[i]+' — '+descs[i]);pets.forEach((p,j)=>p.visible=j===i)}switchPet(0);
 const coins=[];for(let i=0;i<12;i++){let z=7-i*3.4,x=[-2,0,2,1,-1][i%5];let group=new THREE.Group();let ring=new THREE.Mesh(new THREE.TorusGeometry(.29,.085,7,12),gold);group.add(ring);group.position.set(x,.85,z);scene.add(group);coins.push({group,taken:false})}
 // Interlocking gameplay: platform -> tunnel switch -> crate plate -> scent dig.
 const stations=[{x:-3,z:3,done:false},{x:3,z:-7,done:false},{x:-3,z:-17,done:false},{x:3,z:-27,done:false}];
@@ -29,7 +29,7 @@ const plate=box(2,.12,2,mat(0xf7a65c),-1,.07,-17);
 const scent=[];for(let j=0;j<6;j++){let p=ball(.12,mat(0xe99c78),2+j*.36,.18,-23-j*.85);scent.push(p)}
 const digSpot=ball(.45,mat(0x9a683e),4,.25,-28);
 stations.forEach((p,i)=>{challengeObjects.push(ball(.22,mat([0x5caee2,0xb998f0,0xf7a65c,0xe99c78][i]),p.x,1.9,p.z))});
-let sniffUntil=0,crawlUntil=0,scentProgress=0,tunnelEntered=false,pushing=false;
+let crawlUntil=0,scentProgress=0,tunnelEntered=false;
 function collides(x,z){
  if(solidWalls.some(w=>Math.abs(x-w.x)<w.w/2+.43&&Math.abs(z-w.z)<w.d/2+.43))return true;
  if(Math.abs(x-3)<1.32&&Math.abs(z+7)<.58&&!(active===1&&time<crawlUntil))return true;
@@ -40,20 +40,12 @@ function tickChallenges(dt){
    if(position.z>-5.6&&position.z<-4.65)tunnelEntered=true;
    if(tunnelEntered&&position.z<-8.2){tunnelSwitch.material=mat(0x48d77c);finishChallenge(1,'Charlie crawled through the tunnel and activated the switch!')}
  }
- if(active===2&&completed[1]&&!completed[2]&&(keys.has('KeyE')||pushing)){
-   const dx=crate.position.x-position.x,dz=crate.position.z-position.z,dist=Math.hypot(dx,dz);
-   if(dist>.6&&dist<2.05){
-     const nx=crate.position.x+dx/dist*dt*2.3,nz=crate.position.z+dz/dist*dt*2.3;
-     if(Math.abs(nx)<14.6&&nz>-35&&nz<12&&!solidWalls.some(w=>Math.abs(nx-w.x)<w.w/2+.72&&Math.abs(nz-w.z)<w.d/2+.72)){crate.position.x=nx;crate.position.z=nz}
-     if(Math.hypot(crate.position.x+1,crate.position.z+17)<.73){plate.material=mat(0x48d77c);finishChallenge(2,'Aurelia pushed the crate onto the plate!')}
-   }
- }
- if(active===3&&completed[2]&&time<sniffUntil&&scentProgress<scent.length){
+ if(active===3&&completed[2]&&scentProgress<scent.length){
    const p=scent[scentProgress];
    if(Math.hypot(position.x-p.position.x,position.z-p.position.z)<.8){scentProgress++;say('Bonnie tracked '+scentProgress+'/'+scent.length+' scent clues!')}
  }
  pets[active].scale.y=active===1&&time<crawlUntil?.65:1;
- scent.forEach((p,i)=>p.visible=time<sniffUntil&&i>=scentProgress);
+ scent.forEach((p,i)=>p.visible=active===3&&completed[2]&&i>=scentProgress);
 }
 function near(x,z,d=2){return Math.hypot(position.x-x,position.z-z)<d}
 function finishChallenge(i,message){if(completed[i])return;completed[i]=true;stations[i].done=true;challengeObjects[i].material=mat(0x48d77c);say(message);checkGate()}
@@ -62,23 +54,33 @@ const gateZ=-35.5;box(3.6,3.1,.35,wood,-2.1,1.55,gateZ);box(3.6,3.1,.35,wood,2.1
 function jump(){if(!started||won)return;if(grounded||(active===0&&jumps<2)){velocityY=active===0?8.3:7;grounded=false;jumps++}}
 function ability(){
  if(!started||won)return;
- if(active===0){jump();return}
+ if(active===0){say('Cracker double-jumps by pressing Jump twice!');return}
  if(active===1){
    if(!completed[0]){say('Cracker must reach the raised platform first!');return}
-   crawlUntil=time+5;say('Crawl through the purple tunnel, from near side to far side!');return
+   crawlUntil=time+5;say('Crawl through the purple tunnel, from near side to far side!');return;
  }
- if(active===2){
-   if(!completed[1]){say('Charlie must cross the tunnel first!');return}
-   pushing=true;say('Hold E near the wooden crate to push it onto the orange plate!');return
- }
+ if(active===2){say(completed[1]?'Walk into the crate to push it. No ability button needed!':'Charlie must cross the tunnel first!');return}
  if(active===3){
    if(!completed[2]){say('Aurelia must activate the plate first!');return}
    if(scentProgress===scent.length&&near(4,-28,1.5)){digSpot.visible=false;finishChallenge(3,'Bonnie tracked the full scent trail and dug up treasure!');return}
-   sniffUntil=time+15;say(scentProgress===scent.length?'Find the buried mound and press E to dig!':'Follow the glowing scent markers in order ('+scentProgress+'/'+scent.length+')');
+   say(scentProgress===scent.length?'Find the mound and press E to dig!':'Follow the glowing scent markers before digging ('+scentProgress+'/'+scent.length+')');
  }
 }
+function tryMove(nx,nz,dx,dz){
+ // Resolve crate contact in the direction of travel: only Aurelia may push it.
+ if(Math.abs(nx-crate.position.x)<.96&&Math.abs(nz-crate.position.z)<.96){
+   if(active!==2||!completed[1]||completed[2])return false;
+   const oldX=crate.position.x,oldZ=crate.position.z;
+   const cx=oldX+dx,cz=oldZ+dz;
+   if(Math.abs(cx)>14.6||cz< -35||cz>12||solidWalls.some(w=>Math.abs(cx-w.x)<w.w/2+.72&&Math.abs(cz-w.z)<w.d/2+.72))return false;
+   crate.position.x=cx;crate.position.z=cz;
+   if(Math.abs(nx-cx)<.96&&Math.abs(nz-cz)<.96){crate.position.x=oldX;crate.position.z=oldZ;return false}
+   if(Math.hypot(cx+1,cz+17)<.78){plate.material=mat(0x48d77c);finishChallenge(2,'Aurelia pushed the crate onto the pressure plate!')}
+ }
+ return !collides(nx,nz);
+}
 function checkGate(){if(score===12&&completed.every(Boolean)){gateOpen=true;say('All challenges complete! Run through the golden garden gate!')}}
-document.getElementById('jump').onpointerdown=e=>{e.preventDefault();jump()};const powerButton=document.getElementById('ability');powerButton.onpointerdown=e=>{e.preventDefault();ability()};powerButton.onpointerup=powerButton.onpointercancel=()=>{pushing=false};document.getElementById('start').onclick=()=>{document.getElementById('overlay').style.display='none';started=true;say('Collect 12 golden paws and solve the linked challenges! Cracker starts at the blue platform.')};
-addEventListener('keydown',e=>{keys.add(e.code);if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.repeat)return;if(e.code==='Space')jump();if(e.code==='KeyE')ability();if(/^Digit[1-4]$/.test(e.code))switchPet(Number(e.code.at(-1))-1)});addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyE')pushing=false});const pad=document.getElementById('joystick'),nub=document.getElementById('nub');function movePad(e){const r=pad.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,max=r.width*.32,len=Math.hypot(dx,dy),k=len>max?max/len:1;joy.x=dx*k/max;joy.y=dy*k/max;nub.style.transform=`translate(${dx*k}px,${dy*k}px)`}pad.addEventListener('pointerdown',e=>{pad.setPointerCapture(e.pointerId);movePad(e)});pad.addEventListener('pointermove',e=>{if(pad.hasPointerCapture(e.pointerId))movePad(e)});function resetPad(){joy.x=joy.y=0;nub.style.transform='translate(0,0)'}pad.addEventListener('pointerup',resetPad);pad.addEventListener('pointercancel',resetPad);
-const clock=new THREE.Clock();function frame(){requestAnimationFrame(frame);let dt=Math.min(clock.getDelta(),.04);time+=dt;if(started&&!won){let x=joy.x+(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0),z=joy.y+(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-(keys.has('KeyW')||keys.has('ArrowUp')?1:0),len=Math.hypot(x,z);if(len>.1){x/=Math.max(1,len);z/=Math.max(1,len);let speed=active===0?6.4:active===2?4.2:5.3;let nx=THREE.MathUtils.clamp(position.x+x*speed*dt,-15.5,15.5),nz=THREE.MathUtils.clamp(position.z+z*speed*dt,-36.8,13);if(!gateOpen&&position.z>-34.7&&nz<-34.7&&Math.abs(nx)<1.8)nz=-34.7;if(!collides(nx,position.z))position.x=nx;if(!collides(position.x,nz))position.z=nz;pets[active].rotation.y=Math.atan2(-x,-z)}velocityY-=18*dt;position.y+=velocityY*dt;let floor=0;if(active===0&&position.y>=1.8&&velocityY<=0&&Math.abs(position.x+3)<1.4&&Math.abs(position.z-3)<1.4){floor=2.4;finishChallenge(0,'Cracker double-jumped onto the raised platform!')}if(position.y<=floor){position.y=floor;velocityY=0;grounded=true;jumps=0}tickChallenges(dt);coins.forEach(c=>{if(c.taken)return;c.group.rotation.y+=dt*2.5;c.group.position.y=.85+Math.sin(time*3+c.group.position.z)*.14;if(Math.hypot(position.x-c.group.position.x,position.z-c.group.position.z)<.85){c.taken=true;scene.remove(c.group);score++;document.getElementById('score').textContent='⭐ '+score+' / 12';say('Golden paw collected! '+score+'/12');checkGate()}});if(gateOpen){gate.position.y=Math.min(4,gate.position.y+dt*2);if(position.z<-35.5){won=true;document.getElementById('overlay').style.display='flex';document.getElementById('panel').innerHTML='<h1>🏆 Garden Dash Complete!</h1><p>All 12 golden paws collected and every pet helped save the day!</p><button id="again" style="background:#38a96b;color:white;border-radius:18px;padding:14px 26px;font-weight:900">Play Again</button>';document.getElementById('again').onclick=()=>location.reload()}}}pets.forEach((p,i)=>{p.position.copy(position);p.position.y+=Math.sin(time*10)*.025;p.userData.tail.rotation.x=-.45+Math.sin(time*8)*.3});const target=new THREE.Vector3(position.x,position.y+4.5,position.z+8.5);camera.position.lerp(target,Math.min(1,dt*4));camera.lookAt(position.x,position.y+1,position.z-3);renderer.render(scene,camera)}frame();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+document.getElementById('jump').onpointerdown=e=>{e.preventDefault();jump()};const powerButton=document.getElementById('ability');powerButton.onpointerdown=e=>{e.preventDefault();ability()};document.getElementById('start').onclick=()=>{document.getElementById('overlay').style.display='none';started=true;say('Collect 12 golden paws and solve the linked challenges! Cracker starts at the blue platform.')};
+addEventListener('keydown',e=>{keys.add(e.code);if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.repeat)return;if(e.code==='Space')jump();if(e.code==='KeyE')ability();if(/^Digit[1-4]$/.test(e.code))switchPet(Number(e.code.at(-1))-1)});addEventListener('keyup',e=>keys.delete(e.code));const pad=document.getElementById('joystick'),nub=document.getElementById('nub');function movePad(e){const r=pad.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,max=r.width*.32,len=Math.hypot(dx,dy),k=len>max?max/len:1;joy.x=dx*k/max;joy.y=dy*k/max;nub.style.transform=`translate(${dx*k}px,${dy*k}px)`}pad.addEventListener('pointerdown',e=>{pad.setPointerCapture(e.pointerId);movePad(e)});pad.addEventListener('pointermove',e=>{if(pad.hasPointerCapture(e.pointerId))movePad(e)});function resetPad(){joy.x=joy.y=0;nub.style.transform='translate(0,0)'}pad.addEventListener('pointerup',resetPad);pad.addEventListener('pointercancel',resetPad);
+const clock=new THREE.Clock();function frame(){requestAnimationFrame(frame);let dt=Math.min(clock.getDelta(),.04);time+=dt;if(started&&!won){let x=joy.x+(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0),z=joy.y+(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-(keys.has('KeyW')||keys.has('ArrowUp')?1:0),len=Math.hypot(x,z);if(len>.1){x/=Math.max(1,len);z/=Math.max(1,len);let speed=active===0?6.4:active===2?4.2:5.3;let nx=THREE.MathUtils.clamp(position.x+x*speed*dt,-15.5,15.5),nz=THREE.MathUtils.clamp(position.z+z*speed*dt,-36.8,13);if(!gateOpen&&position.z>-34.7&&nz<-34.7&&Math.abs(nx)<1.8)nz=-34.7;if(tryMove(nx,position.z,nx-position.x,0))position.x=nx;if(tryMove(position.x,nz,0,nz-position.z))position.z=nz;pets[active].rotation.y=Math.atan2(-x,-z)}velocityY-=18*dt;position.y+=velocityY*dt;let floor=0;if(active===0&&position.y>=1.8&&velocityY<=0&&Math.abs(position.x+3)<1.4&&Math.abs(position.z-3)<1.4){floor=2.4;finishChallenge(0,'Cracker double-jumped onto the raised platform!')}if(position.y<=floor){position.y=floor;velocityY=0;grounded=true;jumps=0}tickChallenges(dt);coins.forEach(c=>{if(c.taken)return;c.group.rotation.y+=dt*2.5;c.group.position.y=.85+Math.sin(time*3+c.group.position.z)*.14;if(Math.hypot(position.x-c.group.position.x,position.z-c.group.position.z)<.85){c.taken=true;scene.remove(c.group);score++;document.getElementById('score').textContent='⭐ '+score+' / 12';say('Golden paw collected! '+score+'/12');checkGate()}});if(gateOpen){gate.position.y=Math.min(4,gate.position.y+dt*2);if(position.z<-35.5){won=true;document.getElementById('overlay').style.display='flex';document.getElementById('panel').innerHTML='<h1>🏆 Garden Dash Complete!</h1><p>All 12 golden paws collected and every pet helped save the day!</p><button id="again" style="background:#38a96b;color:white;border-radius:18px;padding:14px 26px;font-weight:900">Play Again</button>';document.getElementById('again').onclick=()=>location.reload()}}}pets.forEach((p,i)=>{p.position.copy(position);p.position.y+=Math.sin(time*10)*.025;p.userData.tail.rotation.x=-.45+Math.sin(time*8)*.3});const target=new THREE.Vector3(position.x,position.y+4.5,position.z+8.5);camera.position.lerp(target,Math.min(1,dt*4));camera.lookAt(position.x,position.y+1,position.z-3);renderer.render(scene,camera)}frame();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script></body></html>
