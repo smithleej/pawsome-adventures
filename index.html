@@ -1,12 +1,40 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Pawsome Adventures — Garden Dash</title><style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,sans-serif;touch-action:none;background:#a5d6ed}canvas{display:block}#hud{position:fixed;inset:0;pointer-events:none;color:#233b30}#top{position:absolute;top:env(safe-area-inset-top,8px);left:10px;right:10px;display:flex;gap:8px;align-items:center;justify-content:space-between} .pill{background:#fffdf0e8;border:2px solid #ffffff;border-radius:24px;padding:8px 12px;font-weight:800;box-shadow:0 3px 12px #0002;font-size:13px}#area{position:absolute;top:198px;left:50%;transform:translateX(-50%);background:#ffffffc9;border-radius:14px;padding:4px 10px;font-size:11px;font-weight:800}#objective{position:absolute;top:155px;left:50%;transform:translateX(-50%);background:#233b30dd;color:#fff;border:1px solid #ffffff88;border-radius:16px;padding:6px 11px;font-size:12px;font-weight:700;text-align:center;max-width:90vw}#progress{position:absolute;top:111px;left:50%;transform:translateX(-50%);width:max-content;max-width:94vw;display:flex;gap:5px;flex-wrap:wrap;justify-content:center}#progress span{font-size:11px;background:#fffdf0dd;border-radius:14px;padding:5px 8px;font-weight:750;box-shadow:0 2px 6px #0002}#progress span.done{background:#bdf1c8;color:#155d2c}#progress span.next{outline:2px solid #e6ac45}#message{position:absolute;top:62px;left:50%;transform:translateX(-50%);background:#fffef2ed;padding:9px 15px;border-radius:15px;text-align:center;max-width:min(90vw,540px);font-size:13px;font-weight:700;box-shadow:0 3px 12px #0002}button{font:inherit;border:0;cursor:pointer;touch-action:none}#switcher{position:absolute;bottom:calc(15px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:5px;pointer-events:auto;background:#ffffffb8;padding:5px;border-radius:20px}#switcher button{padding:8px 9px;border-radius:15px;background:#fff;color:#294b38;font-size:11px;font-weight:800;border:2px solid transparent}#switcher button.active{border-color:#2e965e;background:#d8ffdf}#joystick{position:absolute;bottom:calc(22px + env(safe-area-inset-bottom));left:20px;width:116px;height:116px;border-radius:100%;background:#ffffff55;border:3px solid #ffffffa8;pointer-events:auto;touch-action:none}#nub{position:absolute;width:49px;height:49px;border-radius:50%;background:#ffffffe6;box-shadow:0 2px 8px #0003;left:31px;top:31px}#actions{position:absolute;right:16px;bottom:calc(25px + env(safe-area-inset-bottom));display:flex;align-items:end;gap:10px;pointer-events:auto}#actions button{border-radius:50%;background:#fffdf0e8;color:#31553b;font-weight:900;border:3px solid #fff;box-shadow:0 4px 12px #0002;width:72px;height:72px;font-size:12px}#actions #ability{width:84px;height:84px;background:#ffe19b}#overlay{position:fixed;inset:0;background:#193e32b8;display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}#panel{background:#fffdf2;border-radius:26px;padding:24px;max-width:470px;text-align:center;box-shadow:0 16px 50px #0004}#panel h1{margin:0 0 10px;color:#2c6e4a}#panel p{line-height:1.5}#start{background:#38a96b;color:white;border-radius:18px;padding:14px 26px;font-weight:900;font-size:18px}#help{font-size:12px;color:#54695d}@media(max-width:620px){#area{top:177px;font-size:10px}#objective{top:139px;font-size:10px;padding:5px 8px}#progress{top:102px}#progress span{font-size:9px;padding:4px 6px}#message{top:58px;font-size:11px}#switcher{bottom:calc(5px + env(safe-area-inset-bottom))}#switcher button{font-size:10px;padding:6px}#joystick{width:96px;height:96px;bottom:calc(15px + env(safe-area-inset-bottom));left:10px}#nub{left:23px;top:23px}#actions{right:8px;bottom:calc(15px + env(safe-area-inset-bottom));gap:5px}#actions button{width:56px;height:56px;font-size:10px}#actions #ability{width:65px;height:65px}}
-</style></head><body><div id="hud"><div id="top"><div class="pill">🐾 Garden Dash</div><div class="pill" id="score">⭐ 0 / 12</div><div class="pill" id="secrets">🔎 0 / 4</div><div class="pill" id="who">Cracker</div></div><div id="message">Collect paws and use every pet's special power!</div><div id="progress" aria-label="Challenge progress"><span>Cracker ○</span><span>Charlie ○</span><span>Aurelia ○</span><span>Bonnie ○</span></div><div id="objective">Next: Cracker — reach the blue platform</div><div id="area">🌿 Welcome Garden</div><div id="joystick"><div id="nub"></div></div><div id="switcher"></div><div id="actions"><button id="jump">JUMP</button><button id="ability">POWER</button></div></div><div id="overlay"><div id="panel"><h1>🐾 Pawsome Adventures</h1><h2>Garden Dash</h2><p>Help Cracker, Charlie, Aurelia and Bonnie collect 12 golden paws, solve four linked pet challenges and open the garden gate! Explore the side paths for four optional hidden treasures — one for each pet.</p><p id="help">Move with the joystick or WASD / arrows. Jump with the button or Space. Cracker double-jumps with Space twice. Charlie crouches with E. Aurelia pushes crates by walking into them. Bonnie follows scents and digs with E. Switch pets with 1–4.</p><button id="start">Let's Play!</button></div></div><script type="module">
+
+/* Storybook HUD: warm parchment, jewel accents and playful, readable controls. */
+#top{gap:6px;flex-wrap:wrap;justify-content:center}
+.pill{background:linear-gradient(155deg,#fffdf1ee,#f9f0d9e8);border:1.5px solid #ffffff;box-shadow:0 5px 16px #32523b20;color:#36553f;letter-spacing:.1px}
+#score{color:#875c16;background:linear-gradient(150deg,#fff3b6,#fff9e4)}
+#secrets{color:#755093;background:linear-gradient(145deg,#f6e8ff,#fffdf5)}
+#message{border:2px solid #fff;background:linear-gradient(120deg,#fffaf0f7,#f6fff3ed);color:#385040;box-shadow:0 6px 20px #345a4030;font-weight:750;line-height:1.35}
+#message.pop{animation:msgPop .42s ease-out}
+@keyframes msgPop{0%{transform:translateX(-50%) scale(.88)}65%{transform:translateX(-50%) scale(1.06)}100%{transform:translateX(-50%) scale(1)}}
+#progress span{background:#fff8e6e9;border:1.5px solid #ffffff;box-shadow:0 3px 12px #30533a20;transition:background .25s,transform .25s}
+#progress span.done{background:linear-gradient(140deg,#c5f7c8,#9de7bd);border-color:#f6fff7;transform:translateY(-2px)}
+#progress span.next{outline:2px solid #f4bf59}
+#objective{background:linear-gradient(120deg,#2d604ae9,#315975ef);border:2px solid #fef8d0;color:#fffef0;box-shadow:0 5px 18px #20433138;letter-spacing:.1px}
+#area{background:#fff9e5e9;box-shadow:0 3px 12px #2a583525;border:1px solid white;color:#517053}
+#switcher{background:#fffbe0db;border:2px solid #ffffffb8;box-shadow:0 5px 22px #1a392b35;backdrop-filter:blur(8px)}
+#switcher button{border-radius:14px;background:#fffdf5;color:#36543f;transition:transform .12s}
+#switcher button.active{background:linear-gradient(140deg,#bff5d4,#fff4b5);border-color:#499874;transform:translateY(-3px)}
+#actions button{background:linear-gradient(145deg,#fffde8,#eaf7d7);box-shadow:0 6px 16px #1e493e38;border:3px solid white;touch-action:none}
+#actions #ability{background:linear-gradient(145deg,#ffe8a7,#ffd1ab)}
+#joystick{background:#ffffff45;border:3px solid #fff9e8bd;box-shadow:0 4px 18px #23523826}
+#overlay{background:radial-gradient(circle at 50% 20%,#568f83b8,#13382fe8)}
+#panel{background:linear-gradient(170deg,#fffef0,#f7efd4);border:3px solid #ffffff;border-radius:30px;box-shadow:0 20px 60px #102c2866;max-width:510px}
+#panel h1{color:#377b59;font-size:clamp(28px,5vw,40px);letter-spacing:-.8px;text-shadow:0 2px 0 #fff}
+#panel h2{color:#be8238;margin:0 0 12px;letter-spacing:2px;text-transform:uppercase;font-size:17px}
+#panel .storylead{font-size:17px;color:#406451;font-weight:750}
+#start,#again{background:linear-gradient(125deg,#52bc76,#2e916c)!important;box-shadow:0 6px 0 #267454,0 12px 22px #285d423a;color:#fff!important;border-radius:20px}
+#help{font-size:12px;line-height:1.5;color:#556e5d;background:#e7f2df;padding:12px;border-radius:15px}
+@media(max-width:620px){#top{gap:3px} .pill{font-size:10px;padding:6px 8px}#message{max-width:94vw;padding:6px 10px}#progress{max-width:96vw;gap:3px}#progress span{padding:4px 5px}}
+</style></head><body><div id="hud"><div id="top"><div class="pill">🐾 Garden Dash</div><div class="pill" id="score">⭐ 0 / 12</div><div class="pill" id="secrets">🔎 0 / 4</div><div class="pill" id="who">Cracker</div></div><div id="message">Collect paws and use every pet's special power!</div><div id="progress" aria-label="Challenge progress"><span>Cracker ○</span><span>Charlie ○</span><span>Aurelia ○</span><span>Bonnie ○</span></div><div id="objective">Next: Cracker — reach the blue platform</div><div id="area">🌿 Welcome Garden</div><div id="joystick"><div id="nub"></div></div><div id="switcher"></div><div id="actions"><button id="jump">JUMP</button><button id="ability">POWER</button></div></div><div id="overlay"><div id="panel"><h1>🐾 Pawsome Adventures</h1><h2>Garden Dash</h2><p class="storylead">The Golden Garden is losing its sparkle. Four little heroes can bring it back!</p><p>Work together to wake four garden wonders, follow the golden paws, and open the magical gate. Four hidden keepsakes are waiting off the path, too.</p><p id="help">Move with the joystick or WASD / arrows. Jump with the button or Space. Cracker double-jumps with Space twice. Charlie crouches with E. Aurelia pushes crates by walking into them. Bonnie follows scents and digs with E. Switch pets with 1–4.</p><button id="start">Let's Play!</button></div></div><script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
-const scene=new THREE.Scene();scene.background=new THREE.Color(0xbce8fb);scene.fog=new THREE.Fog(0xbce8fb,32,80);
-const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,100);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xffffff,0x8db57d,2));const sun=new THREE.DirectionalLight(0xfff4d7,2.1);sun.position.set(-8,16,9);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-26;sun.shadow.camera.right=26;sun.shadow.camera.top=32;sun.shadow.camera.bottom=-25;scene.add(sun);
-const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.85});const grass=mat(0x7fc477),pathMat=mat(0xdac298),wood=mat(0xa46c42),white=mat(0xffffff),black=mat(0x24262b),grey=mat(0x88939e),red=mat(0xb9622c),pink=mat(0xd9878c),gold=mat(0xffd13f),leaf=mat(0x4d9e58);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xc9ecf4);scene.fog=new THREE.Fog(0xc8e5e4,37,87);
+const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,100);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.27;renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xfff7e5,0x89b49d,2.1));const sun=new THREE.DirectionalLight(0xffedc6,2.1);sun.position.set(-8,16,9);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-26;sun.shadow.camera.right=26;sun.shadow.camera.top=32;sun.shadow.camera.bottom=-25;scene.add(sun);
+const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.85});const grass=mat(0x85c77c),pathMat=mat(0xe6d3a7),wood=mat(0xa46c42),white=mat(0xffffff),black=mat(0x24262b),grey=mat(0x88939e),red=mat(0xb9622c),pink=mat(0xd9878c),gold=mat(0xffd13f),leaf=mat(0x4d9e58);
 function box(w,h,d,m,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}function ball(r,m,x,y,z,parent=scene,s=[1,1,1]){let o=new THREE.Mesh(new THREE.SphereGeometry(r,12,9),m);o.position.set(x,y,z);o.scale.set(...s);o.castShadow=true;parent.add(o);return o}function cylinder(r1,r2,h,m,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,12),m);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
 box(34,.3,54,grass,0,-.2,-12);box(6,.025,49,pathMat,0,-.025,-12);
 for(let z=-37;z<14;z+=3){for(let x of [-16.6,16.6]){box(.3,1.6,.2,wood,x,.7,z);box(.25,.18,3,wood,x,1.15,z+1.3)}}for(let x=-16;x<=16;x+=2){box(.3,1.5,.3,wood,x,.7,14.5);box(.3,.18,1.8,wood,x,1.2,14.5)}
@@ -103,6 +131,73 @@ function gardenSpeedMultiplier(){
  const onStone=steppingStones.some(v=>Math.hypot(position.x-v.x,position.z-v.z)<.55);
  return wet?.58:inPond&&!onStone?.7:1;
 }
+
+/* Storybook art layer. Instancing keeps scores of flowers to a handful of draw calls. */
+const flowerPatches=[[-10,9],[-10,2],[10,8],[12,-7],[-10,-11],[10,-17],[-10,-23],[10,-30]];
+const flowerCount=112, flowerPetals=new THREE.InstancedMesh(new THREE.SphereGeometry(.105,6,5),mat(0xfff5e6),flowerCount*5);
+const flowerCentres=new THREE.InstancedMesh(new THREE.SphereGeometry(.082,6,5),mat(0xffdf78),flowerCount);
+const flowerLeaves=new THREE.InstancedMesh(new THREE.ConeGeometry(.16,.36,4),mat(0x6ab96e),flowerCount);
+const flowerDummy=new THREE.Object3D(),flowerColors=[0xff9aab,0xf9d478,0xd1a9ed,0xffb68a,0xf7f5c7,0x9bd9e0];
+function flowerMatrix(x,y,z,sx,sy,sz,ry=0){
+ flowerDummy.position.set(x,y,z);flowerDummy.rotation.set(0,ry,0);
+ flowerDummy.scale.set(sx,sy,sz);flowerDummy.updateMatrix();return flowerDummy.matrix;
+}
+for(let i=0;i<flowerCount;i++){
+ const patch=flowerPatches[i%flowerPatches.length];
+ const angle=i*2.39996,rad=.4+((i*37)%11)/11*2.25;
+ const x=patch[0]+Math.cos(angle)*rad,z=patch[1]+Math.sin(angle)*rad;
+ flowerLeaves.setMatrixAt(i,flowerMatrix(x,.18,z,.72,1,.72,i));
+ flowerCentres.setMatrixAt(i,flowerMatrix(x,.39,z,1,1,1));
+ for(let j=0;j<5;j++){
+  const a=j*Math.PI*2/5,idx=i*5+j;
+  flowerPetals.setMatrixAt(idx,flowerMatrix(x+Math.cos(a)*.17,.40,z+Math.sin(a)*.17,1.3,.58,1.3,a));
+  flowerPetals.setColorAt(idx,new THREE.Color(flowerColors[(i+j+Math.floor(i/14))%flowerColors.length]));
+ }
+}
+for(const mesh of [flowerPetals,flowerCentres,flowerLeaves]){mesh.castShadow=false;mesh.receiveShadow=false;scene.add(mesh)}
+// Rounded flagstones create a wandering trail on the original safe walkway.
+const flagstones=new THREE.InstancedMesh(new THREE.CylinderGeometry(.57,.58,.065,7),mat(0xf3e3ba),26);
+for(let i=0;i<26;i++){
+ const x=Math.sin(i*1.37)*1.28,z=10-i*1.76;
+ flagstones.setMatrixAt(i,flowerMatrix(x,.035,z,.85+(i%3)*.08,1,1.02,i*.47));
+}flagstones.castShadow=false;flagstones.receiveShadow=false;scene.add(flagstones);
+// Soft distant hills and fluffy clouds make the horizon feel like a little picture book.
+const softHill=mat(0x96c9ad),farHill=mat(0xb1d9be),skyWhite=new THREE.MeshBasicMaterial({color:0xfffdf1});
+for(const [x,z,r,color] of [[-15,-49,12,softHill],[6,-55,17,farHill],[21,-49,13,softHill]]){
+ const hill=ball(r,color,x,-r*.67,z,scene,[1.5,.65,.8]);hill.castShadow=false;hill.receiveShadow=false;
+}
+const storyClouds=[];
+for(let i=0;i<4;i++){
+ const g=new THREE.Group();
+ g.position.set(-14+i*10,12+(i%2)*2,-29-(i%2)*15);
+ for(const [dx,dy,r] of [[-.75,0,.87],[0,.26,1.18],[1,0,.91]]){
+  const puff=ball(r,skyWhite,dx,dy,0,g,[1.25,.6,.86]);puff.castShadow=false;
+ }
+ scene.add(g);storyClouds.push({g,x:g.position.x,phase:i*1.1});
+}
+const pondRipples=[];
+for(let i=0;i<2;i++){
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(1,.025,5,44),new THREE.MeshBasicMaterial({color:0xd6ffff,transparent:true,opacity:.5,depthWrite:false}));
+ ring.rotation.x=-Math.PI/2;ring.position.set(9,.15,0);ring.castShadow=false;scene.add(ring);pondRipples.push(ring);
+}
+// Bunting strings above two side paths, well above the pets.
+const buntingColors=[mat(0xf8a7ab),mat(0xffd77e),mat(0xb8a4f0),mat(0x9bd6ba)];
+for(const z of [5,-25]){
+ const rope=box(12,.035,.035,wood,0,4.5,z);rope.castShadow=false;
+ for(let k=0;k<8;k++){
+  const flag=new THREE.Mesh(new THREE.ConeGeometry(.23,.5,3),buntingColors[k%4]);
+  flag.rotation.z=Math.PI;flag.position.set(-5.15+k*1.48,4.16,z);
+  flag.castShadow=false;scene.add(flag);
+ }
+}
+function animateStoryWorld(){
+ for(const [i,ring] of pondRipples.entries()){
+  const phase=(time*.36+i*.5)%1;ring.scale.setScalar(.65+phase*1.75);
+  ring.material.opacity=.42*(1-phase);
+ }
+ storyClouds.forEach(c=>c.g.position.x=c.x+Math.sin(time*.13+c.phase)*.6);
+}
+
 const names=['Cracker','Charlie','Aurelia','Bonnie'],descs=['Double jump','Climb & crawl','Super strength','Sniff & dig'];let pets=[];
 function pet(kind){const root=new THREE.Group(),isDog=kind>=2,coat=[black,grey,black,red][kind],size=kind===2?1.35:kind===3?1.12:kind===1?1.02:.91;root.scale.setScalar(size);let body=ball(.42,coat,0,.67,.12,root,[.83,.85,isDog?1.65:1.25]);let head=ball(.39,coat,0,1.09,-.42,root,[1.07,kind===1?1.13:1.08,isDog?1.13:1]);if(kind===0){ball(.25,white,0,.66,-.17,root,[.8,1,.42]);ball(.15,white,0,.99,-.74,root,[.75,.7,.25])}if(kind===1){ball(.31,grey,0,1.06,-.44,root,[1.1,1.1,1])}if(isDog){ball(.21,kind===2?black:red,0,.93,-.83,root,[.85,.65,1.35]);ball(.105,black,0,.99,-1.1,root,[1.2,.7,.8]);for(let s of [-1,1]){let ear=ball(.17,coat,s*.29,1.23,-.42,root,[.65,1.4,.85]);ear.rotation.z=s*.35}}else{for(let s of [-1,1]){let ear=new THREE.Mesh(new THREE.ConeGeometry(.17,.34,4),coat);ear.position.set(s*.24,1.39,-.44);ear.rotation.y=Math.PI/4;root.add(ear)}}for(let s of [-1,1]){
  const eyeZ=isDog?-.79:-.765;
@@ -307,7 +402,7 @@ updateProgress();updateObjective();const cameraLook=new THREE.Vector3(0,1,6),clo
   position.y=platformTop;velocityY=0;grounded=true;jumps=0;
   if(active===0)finishChallenge(0,'Cracker landed on the raised platform!');
  }else if(position.y<=0){position.y=0;velocityY=0;grounded=true;jumps=0}
- else if(grounded&&previousY>=platformTop&&(!onPlatform||position.y>platformTop+.1)){grounded=false}tickChallenges(dt);collectSecrets();if(!gateOpen&&position.z<-32.8&&time>gateReminderAt){gateReminderAt=time+7;say('Gate locked: '+(12-score)+' paws and '+completed.filter(v=>!v).length+' challenges remaining.');}
+ else if(grounded&&previousY>=platformTop&&(!onPlatform||position.y>platformTop+.1)){grounded=false}tickChallenges(dt);collectSecrets();animateStoryWorld();if(!gateOpen&&position.z<-32.8&&time>gateReminderAt){gateReminderAt=time+7;say('Gate locked: '+(12-score)+' paws and '+completed.filter(v=>!v).length+' challenges remaining.');}
  const area=position.z>1?'🌻 Welcome Garden':position.z>-12?'🌊 Lily Pond & Rose Arch':position.z>-24?'💦 Sprinkler Lawn':'🌳 Secret Hedge Grove';
  const areaEl=document.getElementById('area');if(areaEl.textContent!==area)areaEl.textContent=area;
  coins.forEach(c=>{if(c.taken)return;c.group.rotation.y+=dt*2.5;c.group.position.y=.85+Math.sin(time*3+c.group.position.z)*.14;if(Math.hypot(position.x-c.group.position.x,position.z-c.group.position.z)<.85){c.taken=true;sparkleBurst(c.group.position.x,c.group.position.y,c.group.position.z);scene.remove(c.group);score++;document.getElementById('score').textContent='⭐ '+score+' / 12';say('Golden paw collected! '+score+'/12');checkGate()}});animateSparkles(dt);updateObjective();if(gateOpen){gate.position.y=Math.min(4,gate.position.y+dt*2);if(position.z<-35.5&&Math.abs(position.x)<1.65){won=true;document.getElementById('overlay').style.display='flex';document.getElementById('panel').innerHTML='<h1>🏆 Garden Dash Complete!</h1><p>All 12 golden paws collected and every pet helped save the day! Optional secrets: '+secrets.filter(s=>s.taken).length+'/4</p><button id="again" style="background:#38a96b;color:white;border-radius:18px;padding:14px 26px;font-weight:900">Play Again</button>';document.getElementById('again').onclick=()=>location.reload()}}}pets.forEach((p,i)=>{
