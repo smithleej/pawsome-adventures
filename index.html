@@ -58,6 +58,19 @@ grass.color.setHex(0xffffff);
 grass.map=paintedTexture('#80bd77',[[28,113,48],[199,223,121],[40,152,92],[235,233,157]],121,8,16);
 pathMat.color.setHex(0xffffff);
 pathMat.map=paintedTexture('#ddcba2',[[154,123,83],[247,231,192],[197,156,111]],462,3,22);
+// Gently bevel interactive props so they feel sculpted, not like raw cubes.
+function roundedBox(w,h,d,m,x,y,z,r=.12,parent=scene){
+ r=Math.min(r,w*.22,h*.22,d*.22);
+ const shape=new THREE.Shape(),L=-w/2,R=w/2,B=-h/2,T=h/2;
+ shape.moveTo(L+r,B);shape.lineTo(R-r,B);shape.quadraticCurveTo(R,B,R,B+r);
+ shape.lineTo(R,T-r);shape.quadraticCurveTo(R,T,R-r,T);
+ shape.lineTo(L+r,T);shape.quadraticCurveTo(L,T,L,T-r);
+ shape.lineTo(L,B+r);shape.quadraticCurveTo(L,B,L+r,B);
+ const geometry=new THREE.ExtrudeGeometry(shape,{depth:Math.max(.01,d-2*r),steps:1,bevelEnabled:true,bevelThickness:r,bevelSize:r,bevelSegments:3,curveSegments:5});
+ geometry.translate(0,0,-d/2+r);
+ const obj=new THREE.Mesh(geometry,m);obj.position.set(x,y,z);
+ obj.castShadow=true;obj.receiveShadow=true;parent.add(obj);return obj;
+}
 const gardenGround=box(34,.3,54,grass,0,-.2,-12);
 gardenGround.castShadow=false;
 // A gently winding sandy footpath, with narrower edging ribbons, replaces the straight slab.
@@ -555,11 +568,30 @@ const hintRing=new THREE.Mesh(new THREE.TorusGeometry(.78,.08,8,20),new THREE.Me
 const hintArrow=new THREE.Mesh(new THREE.ConeGeometry(.3,.6,8),new THREE.MeshStandardMaterial({color:0xffd13f,emissive:0x665500}));hintArrow.rotation.z=Math.PI;hintArrow.position.y=1.6;hintMarker.add(hintArrow);
 const gateHint=ball(.14,mat(0xffd13f),0,.16,-33.6);
 function wall(w,h,d,x,y,z){let o=box(w,h,d,wood,x,y,z);solidWalls.push({x,z,w,d});return o}
-const platform=box(2.8,.35,2.8,mat(0x5caee2),-3,2.2,3);platforms.push({x:-3,z:3,w:2.8,d:2.8,y:2.4});
-ball(.36,gold,-3,2.95,3);wall(1.2,1.7,.7,1.1,.85,-7);wall(1.2,1.7,.7,4.9,.85,-7);box(2.6,.4,.7,mat(0xb998f0),3,1.7,-7); // crawl under the beam
+const platform=roundedBox(2.8,.35,2.8,mat(0x6dbfe5),-3,2.2,3,.1);platforms.push({x:-3,z:3,w:2.8,d:2.8,y:2.4});
+ball(.36,gold,-3,2.95,3);wall(1.2,1.7,.7,1.1,.85,-7);wall(1.2,1.7,.7,4.9,.85,-7);roundedBox(2.6,.4,.7,mat(0xc5a4f0),3,1.7,-7,.1); // crawl under the beam
 const tunnelSwitch=ball(.35,mat(0xb998f0),3,.3,-9);
-const crate=box(1.3,1.3,1.3,wood,-4.5,.65,-17);crate.userData.pushed=false;
-const plate=box(2,.12,2,mat(0xf7a65c),-1,.07,-17);
+const crate=roundedBox(1.3,1.3,1.3,mat(0xc69662),-4.5,.65,-17,.14);
+const crateDecal=ball(.25,mat(0xf5d79e),0,.06,-.68,crate,[1,.9,.16]);crateDecal.castShadow=false;
+const cratePaw=ball(.095,mat(0xa2683b),0,.14,-.805,crate,[1,.8,.22]);cratePaw.castShadow=false;
+for(let side of [-1,1])for(let y of [-.45,.45]){
+ const corner=roundedBox(.14,.16,1.28,mat(0x946c42),side*.52,y,0,.045,crate);corner.castShadow=false;
+}crate.userData.pushed=false;
+const plate=roundedBox(2,.12,2,mat(0xf1b873),-1,.07,-17,.045);
+
+const platformTrim=new THREE.Mesh(new THREE.TorusGeometry(1.02,.075,8,32),
+ new THREE.MeshStandardMaterial({color:0xf6e2aa,emissive:0x6f9ebf,emissiveIntensity:.12}));
+platformTrim.rotation.x=-Math.PI/2;platformTrim.position.set(-3,2.42,3);platformTrim.castShadow=false;scene.add(platformTrim);
+for(const [x,z] of [[-4.12,1.87],[-1.88,1.87],[-4.12,4.13],[-1.88,4.13]]){
+ const plant=ball(.19,mat(0xffe3a9),x,2.47,z);plant.castShadow=false;
+}
+const tunnelLilacs=[-1,1].map(side=>{
+ const b=ball(.26,mat(0xd2baf0),3+side*.93,2.07,-7.05,scene,[1.3,.9,1.0]);
+ b.castShadow=false;return b;
+});
+const plateRing=new THREE.Mesh(new THREE.TorusGeometry(.68,.09,8,32),mat(0xffe5a0));
+plateRing.rotation.x=-Math.PI/2;plateRing.position.set(-1,.145,-17);plateRing.castShadow=false;scene.add(plateRing);
+
 const scent=[];for(let j=0;j<6;j++){let p=ball(.12,mat(0xe99c78),2+j*.36,.18,-23-j*.85);scent.push(p)}
 const digSpot=ball(.45,mat(0x9a683e),4,.25,-28);
 stations.forEach((p,i)=>{challengeObjects.push(ball(.22,mat([0x5caee2,0xb998f0,0xf7a65c,0xe99c78][i]),p.x,1.9,p.z))});
@@ -600,7 +632,7 @@ function finishChallenge(i,message){
  updateProgress();updateObjective();checkGate();
 }
 // Gate opens only after paws and challenges are completed.
-const gateZ=-35.5;box(3.6,3.1,.35,wood,-2.1,1.55,gateZ);box(3.6,3.1,.35,wood,2.1,1.55,gateZ);let gate=box(3.5,2.8,.25,mat(0xc99358),0,1.4,gateZ);let gateOpen=false;ball(.3,gold,0,2.8,gateZ+.3);
+const gateZ=-35.5;box(3.6,3.1,.35,wood,-2.1,1.55,gateZ);box(3.6,3.1,.35,wood,2.1,1.55,gateZ);let gate=roundedBox(3.5,2.8,.25,mat(0xdbb076),0,1.4,gateZ,.09);let gateOpen=false;ball(.3,gold,0,2.8,gateZ+.3);
 
 /* A single magical garden quest: each pet awakens a bloom and lights the exit arch. */
 const powerColors=[0x65c9f0,0xc9a2f3,0xffb967,0xf19c79];
