@@ -240,16 +240,22 @@ const plate=box(2,.12,2,mat(0xf7a65c),-1,.07,-17);
 const scent=[];for(let j=0;j<6;j++){let p=ball(.12,mat(0xe99c78),2+j*.36,.18,-23-j*.85);scent.push(p)}
 const digSpot=ball(.45,mat(0x9a683e),4,.25,-28);
 stations.forEach((p,i)=>{challengeObjects.push(ball(.22,mat([0x5caee2,0xb998f0,0xf7a65c,0xe99c78][i]),p.x,1.9,p.z))});
-let crawlUntil=0,scentProgress=0,tunnelEntered=false;
+let crawlUntil=0,scentProgress=0,tunnelEntered=false,tunnelCrossed=false,gateReminderAt=0;
 function collides(x,z){
  if(solidWalls.some(w=>Math.abs(x-w.x)<w.w/2+.43&&Math.abs(z-w.z)<w.d/2+.43))return true;
  if(Math.abs(x-3)<1.32&&Math.abs(z+7)<.58&&!(active===1&&time<crawlUntil))return true;
  return Math.abs(x-crate.position.x)<.96&&Math.abs(z-crate.position.z)<.96;
 }
 function tickChallenges(dt){
- if(active===1&&completed[0]&&!completed[1]&&time<crawlUntil&&Math.abs(position.x-3)<1.1){
-   if(position.z>-5.6&&position.z<-4.65)tunnelEntered=true;
-   if(tunnelEntered&&position.z<-8.2){tunnelSwitch.material=mat(0x48d77c);finishChallenge(1,'Charlie crawled through the tunnel and activated the switch!')}
+ if(active===1&&completed[0]&&!completed[1]){
+   if(time>=crawlUntil){tunnelEntered=false;tunnelCrossed=false}
+   else if(Math.abs(position.x-3)<1.1){
+    if(position.z>-5.6&&position.z<-4.65)tunnelEntered=true;
+    if(tunnelEntered&&Math.abs(position.z+7)<.46)tunnelCrossed=true;
+    if(tunnelEntered&&tunnelCrossed&&position.z<-8.2){
+     tunnelSwitch.material=mat(0x48d77c);finishChallenge(1,'Charlie crawled all the way under the beam and activated the switch!');
+    }
+   }
  }
  if(active===3&&completed[2]&&scentProgress<scent.length){
    const p=scent[scentProgress];
@@ -268,7 +274,7 @@ function ability(){
  if(active===0){say('Cracker double-jumps by pressing Jump twice!');return}
  if(active===1){
    if(!completed[0]){say('Cracker must reach the raised platform first!');return}
-   crawlUntil=time+5;say('Crawl through the purple tunnel, from near side to far side!');return;
+   crawlUntil=time+5;tunnelEntered=false;tunnelCrossed=false;say('Crawl through the purple tunnel, from near side to far side!');return;
  }
  if(active===2){say(completed[1]?'Walk into the crate to push it. No ability button needed!':'Charlie must cross the tunnel first!');return}
  if(active===3){
@@ -301,10 +307,10 @@ updateProgress();updateObjective();const cameraLook=new THREE.Vector3(0,1,6),clo
   position.y=platformTop;velocityY=0;grounded=true;jumps=0;
   if(active===0)finishChallenge(0,'Cracker landed on the raised platform!');
  }else if(position.y<=0){position.y=0;velocityY=0;grounded=true;jumps=0}
- else if(grounded&&previousY>=platformTop&&(!onPlatform||position.y>platformTop+.1)){grounded=false}tickChallenges(dt);collectSecrets();
+ else if(grounded&&previousY>=platformTop&&(!onPlatform||position.y>platformTop+.1)){grounded=false}tickChallenges(dt);collectSecrets();if(!gateOpen&&position.z<-32.8&&time>gateReminderAt){gateReminderAt=time+7;say('Gate locked: '+(12-score)+' paws and '+completed.filter(v=>!v).length+' challenges remaining.');}
  const area=position.z>1?'🌻 Welcome Garden':position.z>-12?'🌊 Lily Pond & Rose Arch':position.z>-24?'💦 Sprinkler Lawn':'🌳 Secret Hedge Grove';
  const areaEl=document.getElementById('area');if(areaEl.textContent!==area)areaEl.textContent=area;
- coins.forEach(c=>{if(c.taken)return;c.group.rotation.y+=dt*2.5;c.group.position.y=.85+Math.sin(time*3+c.group.position.z)*.14;if(Math.hypot(position.x-c.group.position.x,position.z-c.group.position.z)<.85){c.taken=true;sparkleBurst(c.group.position.x,c.group.position.y,c.group.position.z);scene.remove(c.group);score++;document.getElementById('score').textContent='⭐ '+score+' / 12';say('Golden paw collected! '+score+'/12');checkGate()}});animateSparkles(dt);updateObjective();if(gateOpen){gate.position.y=Math.min(4,gate.position.y+dt*2);if(position.z<-35.5){won=true;document.getElementById('overlay').style.display='flex';document.getElementById('panel').innerHTML='<h1>🏆 Garden Dash Complete!</h1><p>All 12 golden paws collected and every pet helped save the day! Optional secrets: '+secrets.filter(s=>s.taken).length+'/4</p><button id="again" style="background:#38a96b;color:white;border-radius:18px;padding:14px 26px;font-weight:900">Play Again</button>';document.getElementById('again').onclick=()=>location.reload()}}}pets.forEach((p,i)=>{
+ coins.forEach(c=>{if(c.taken)return;c.group.rotation.y+=dt*2.5;c.group.position.y=.85+Math.sin(time*3+c.group.position.z)*.14;if(Math.hypot(position.x-c.group.position.x,position.z-c.group.position.z)<.85){c.taken=true;sparkleBurst(c.group.position.x,c.group.position.y,c.group.position.z);scene.remove(c.group);score++;document.getElementById('score').textContent='⭐ '+score+' / 12';say('Golden paw collected! '+score+'/12');checkGate()}});animateSparkles(dt);updateObjective();if(gateOpen){gate.position.y=Math.min(4,gate.position.y+dt*2);if(position.z<-35.5&&Math.abs(position.x)<1.65){won=true;document.getElementById('overlay').style.display='flex';document.getElementById('panel').innerHTML='<h1>🏆 Garden Dash Complete!</h1><p>All 12 golden paws collected and every pet helped save the day! Optional secrets: '+secrets.filter(s=>s.taken).length+'/4</p><button id="again" style="background:#38a96b;color:white;border-radius:18px;padding:14px 26px;font-weight:900">Play Again</button>';document.getElementById('again').onclick=()=>location.reload()}}}pets.forEach((p,i)=>{
  p.position.copy(position);
  const gait=Math.sin(time*(i===2?10:13));
  const isActive=i===active;
