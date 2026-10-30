@@ -58,7 +58,30 @@ function pet(kind){const root=new THREE.Group(),isDog=kind>=2,coat=[black,grey,b
  ball(.038,black,s*.17,1.14,eyeZ-.082,root,[.86,1.12,.5]);
  const glint=ball(.018,white,s*.17-.017,1.167,eyeZ-.111,root);glint.castShadow=false;
  ball(.105,coat,s*.315,1.00,isDog?-.69:-.66,root,[1.05,.66,.83]);
-}for(let x of [-.28,.28])for(let z of [-.22,.4]){ball(.13,coat,x,.27,z,root,[1,1.8,1]);if(kind===0)ball(.105,white,x,.12,z-.03,root,[1,.5,1])}let tail=ball(.11,coat,0,.79,isDog?.93:.72,root,[.8,.8,isDog?2.2:2.6]);tail.rotation.x=-.45;root.userData.tail=tail;root.position.set(0,0,9);scene.add(root);return root}
+}
+// Small breed-specific finishing touches, without changing controls or physics.
+const earPink=mat(0xe9a5ae),muzzleCream=mat(0xf2c49b),nose=mat(0x443239);
+if(isDog){
+ // A softer, elongated muzzle and hanging ears keep Bonnie recognisably Labrador-like.
+ const muzzle=ball(kind===2?.16:.18,kind===3?muzzleCream:coat,0,.94,-.94,root,[1.02,.65,1.32]);
+ ball(.08,nose,0,1.025,-1.18,root,[1.2,.8,.64]);
+ for(const side of [-1,1]){
+  const flap=ball(.105,coat,side*.37,1.10,-.49,root,[.88,1.55,.88]);
+  flap.rotation.z=side*.28;
+ }
+}else{
+ // Cat ear inserts and tiny rounded whisker pads.
+ for(const side of [-1,1]){
+  const insert=new THREE.Mesh(new THREE.ConeGeometry(.095,.20,4),earPink);
+  insert.position.set(side*.24,1.4,-.57);insert.rotation.y=Math.PI/4;root.add(insert);
+  ball(.105,kind===0?white:grey,side*.11,.95,-.77,root,[1.1,.68,.55]);
+ }
+}
+for(let x of [-.28,.28])for(let z of [-.22,.4]){
+ ball(.13,coat,x,.27,z,root,[1,1.8,1]);
+ ball(.14,kind===0?white:coat,x,.12,z-.07,root,[1.14,.53,1.25]);
+}
+let tail=ball(.11,coat,0,.79,isDog?.93:.72,root,[.8,.8,isDog?2.2:2.6]);tail.rotation.x=-.45;root.userData.tail=tail;root.position.set(0,0,9);scene.add(root);return root}
 for(let i=0;i<4;i++)pets.push(pet(i));let active=0;const switcher=document.getElementById('switcher');names.forEach((n,i)=>{let b=document.createElement('button');b.textContent=['🐈‍⬛','🐈','🐕‍🦺','🦮'][i]+' '+n;b.onclick=()=>switchPet(i);switcher.appendChild(b)});
 let position=new THREE.Vector3(0,0,9),velocityY=0,grounded=true,jumps=0,score=0,started=false,won=false,completed=[false,false,false,false],keys=new Set(),joy={x:0,y:0},time=0;const hud=document.getElementById('message');function say(s){hud.textContent=s}function switchPet(i){
  if(started&&!grounded){say('Land before switching pets!');return}
