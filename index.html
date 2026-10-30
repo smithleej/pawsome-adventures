@@ -35,7 +35,7 @@ const scene=new THREE.Scene();scene.background=new THREE.Color(0xc9ecf4);scene.f
 const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,100);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.27;renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xfff7e5,0x89b49d,2.1));const sun=new THREE.DirectionalLight(0xffedc6,2.1);sun.position.set(-8,16,9);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-26;sun.shadow.camera.right=26;sun.shadow.camera.top=32;sun.shadow.camera.bottom=-25;scene.add(sun);
 const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.85});const grass=mat(0x85c77c),pathMat=mat(0xe6d3a7),wood=mat(0xa46c42),white=mat(0xffffff),black=mat(0x24262b),grey=mat(0x88939e),red=mat(0xb9622c),pink=mat(0xd9878c),gold=mat(0xffd13f),leaf=mat(0x4d9e58);
-function box(w,h,d,m,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}function ball(r,m,x,y,z,parent=scene,s=[1,1,1]){let o=new THREE.Mesh(new THREE.SphereGeometry(r,12,9),m);o.position.set(x,y,z);o.scale.set(...s);o.castShadow=true;parent.add(o);return o}function cylinder(r1,r2,h,m,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,12),m);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
+function box(w,h,d,m,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}function ball(r,m,x,y,z,parent=scene,s=[1,1,1]){let o=new THREE.Mesh(new THREE.SphereGeometry(r,24,16),m);o.position.set(x,y,z);o.scale.set(...s);o.castShadow=true;parent.add(o);return o}function cylinder(r1,r2,h,m,x,y,z,parent=scene){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,20),m);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
 box(34,.3,54,grass,0,-.2,-12);box(6,.025,49,pathMat,0,-.025,-12);
 for(let z=-37;z<14;z+=3){for(let x of [-16.6,16.6]){box(.3,1.6,.2,wood,x,.7,z);box(.25,.18,3,wood,x,1.15,z+1.3)}}for(let x=-16;x<=16;x+=2){box(.3,1.5,.3,wood,x,.7,14.5);box(.3,.18,1.8,wood,x,1.2,14.5)}
 for(let i=0;i<34;i++){let x=(Math.sin(i*27.4)*.5+.5)*27-13.5,z=(Math.cos(i*19.2)*.5+.5)*47-35;if(Math.abs(x)<4)continue;cylinder(.1,.13,.9,wood,x,.45,z);ball(.65,leaf,x,1.2,z,scene,[1,.9,1])}
@@ -199,42 +199,108 @@ function animateStoryWorld(){
 }
 
 const names=['Cracker','Charlie','Aurelia','Bonnie'],descs=['Double jump','Climb & crawl','Super strength','Sniff & dig'];let pets=[];
-function pet(kind){const root=new THREE.Group(),isDog=kind>=2,coat=[black,grey,black,red][kind],size=kind===2?1.35:kind===3?1.12:kind===1?1.02:.91;root.scale.setScalar(size);let body=ball(.42,coat,0,.67,.12,root,[.83,.85,isDog?1.65:1.25]);let head=ball(.39,coat,0,1.09,-.42,root,[1.07,kind===1?1.13:1.08,isDog?1.13:1]);if(kind===0){ball(.25,white,0,.66,-.17,root,[.8,1,.42]);ball(.15,white,0,.99,-.74,root,[.75,.7,.25])}if(kind===1){ball(.31,grey,0,1.06,-.44,root,[1.1,1.1,1])}if(isDog){ball(.21,kind===2?black:red,0,.93,-.83,root,[.85,.65,1.35]);ball(.105,black,0,.99,-1.1,root,[1.2,.7,.8]);for(let s of [-1,1]){let ear=ball(.17,coat,s*.29,1.23,-.42,root,[.65,1.4,.85]);ear.rotation.z=s*.35}}else{for(let s of [-1,1]){let ear=new THREE.Mesh(new THREE.ConeGeometry(.17,.34,4),coat);ear.position.set(s*.24,1.39,-.44);ear.rotation.y=Math.PI/4;root.add(ear)}}for(let s of [-1,1]){
- const eyeZ=isDog?-.79:-.765;
- ball(.093,white,s*.17,1.14,eyeZ,root,[.82,1.15,.50]);
- ball(.061,mat(kind===1?0xe7bc56:0xa7bf7e),s*.17,1.14,eyeZ-.047,root,[.88,1.13,.54]);
- ball(.038,black,s*.17,1.14,eyeZ-.082,root,[.86,1.12,.5]);
- const glint=ball(.018,white,s*.17-.017,1.167,eyeZ-.111,root);glint.castShadow=false;
- ball(.105,coat,s*.315,1.00,isDog?-.69:-.66,root,[1.05,.66,.83]);
-}
-// Small breed-specific finishing touches, without changing controls or physics.
-const earPink=mat(0xe9a5ae),muzzleCream=mat(0xf2c49b),nose=mat(0x443239);
-if(isDog){
- // A softer, elongated muzzle and hanging ears keep Bonnie recognisably Labrador-like.
- const muzzle=ball(kind===2?.16:.18,kind===3?muzzleCream:coat,0,.94,-.94,root,[1.02,.65,1.32]);
- ball(.08,nose,0,1.025,-1.18,root,[1.2,.8,.64]);
+// Individually sculpted pet silhouettes: layered coats, expressive heads and articulated ears.
+const furCream=mat(0xffedcf),furWhite=mat(0xfff9ee),furPink=mat(0xd98090),
+  furGold=mat(0xe9b66d),furHazel=mat(0x925b37),furMint=mat(0x85af78),
+  furNose=mat(0x343039),furMuzzle=mat(0x9c918f),furRose=mat(0xe1a69b),
+  collarBlue=mat(0x6fafe0),collarPink=mat(0xd891b0),collarGold=mat(0xe6bd57);
+const pureGlint=new THREE.MeshBasicMaterial({color:0xffffff});
+function pet(kind){
+ const root=new THREE.Group(),isDog=kind>=2,coat=[black,grey,black,red][kind];
+ const size=[.96,1.03,1.31,1.13][kind];
+ root.scale.setScalar(size);
+ root.userData.baseScale=size;
+ const rump=ball(.47,coat,0,.67,.31,root,[.98,.88,isDog?1.46:1.06]);
+ const chest=ball(.41,coat,0,.79,-.22,root,[1,1.02,isDog?1.08:.93]);
+ root.userData.body=rump;root.userData.bodyBase=.88;
+ // Distinctive chest bib and soft belly.
+ if(kind===0)ball(.27,furWhite,0,.71,-.55,root,[.82,1.15,.47]);
+ if(kind===1)ball(.32,mat(0xabb1bb),0,.62,-.39,root,[.9,.8,.53]);
+ if(kind===2)ball(.24,mat(0x565055),0,.64,-.56,root,[.86,.9,.3]);
+ if(kind===3)ball(.27,furCream,0,.66,-.55,root,[.78,1,.38]);
+ const neck=new THREE.Group();neck.position.set(0,1.11,-.49);root.add(neck);
+ const headCoat=kind===1?mat(0x8e9aa8):coat;
+ const skull=ball(.43,headCoat,0,.06,0,neck,[kind===1?1.2:kind===2?1.13:1.08,kind===1?1.09:1.05,isDog?1.06:.96]);
+ // Cute full cheeks frame the face.
  for(const side of [-1,1]){
-  const flap=ball(.105,coat,side*.37,1.10,-.49,root,[.88,1.55,.88]);
-  flap.rotation.z=side*.28;
+  ball(.19,headCoat,side*.30,-.14,-.18,neck,[1.05,.9,.9]);
  }
-}else{
- // Cat ear inserts and tiny rounded whisker pads.
+ // Breed-specific long muzzles, round cheeks and contrasting masks.
+ const muzzleCoat=kind===0?furWhite:kind===1?mat(0xc4c8d0):kind===2?mat(0x4a4447):furCream;
+ if(isDog){
+  const length=kind===2?.44:.53;
+  ball(.26,muzzleCoat,0,-.16,-.46,neck,[kind===2?1.25:1.02,.7,kind===2?1.38:1.63]);
+  ball(.135,furNose,0,-.12,-.46-length*.63,neck,[1.45,.85,.8]);
+  for(const side of [-1,1]){
+   const earGroup=new THREE.Group();earGroup.position.set(side*.38,.27,.06);neck.add(earGroup);
+   ball(.19,coat,side*.04,-.17,0,earGroup,[.72,1.35,.68]);
+   const inner=ball(.105,kind===3?mat(0xa34f39):furMuzzle,side*.035,-.21,-.125,earGroup,[.82,1.03,.30]);inner.castShadow=false;
+   earGroup.rotation.z=side*.19;
+   if(!root.userData.ears)root.userData.ears=[];root.userData.ears.push(earGroup);
+   if(kind===2)ball(.09,furHazel,side*.23,.38,-.33,neck,[1.3,.52,.55]);
+  }
+ }else{
+  for(const side of [-1,1]){
+   const earGroup=new THREE.Group();earGroup.position.set(side*.29,.40,-.02);neck.add(earGroup);
+   const ear=new THREE.Mesh(new THREE.ConeGeometry(kind===1?.21:.205,kind===1?.37:.45,7),coat);
+   ear.position.set(0,.12,0);ear.rotation.y=Math.PI/7;ear.castShadow=true;earGroup.add(ear);
+   const inside=new THREE.Mesh(new THREE.ConeGeometry(.12,.24,7),furPink);
+   inside.position.set(0,.12,-.145);inside.rotation.y=Math.PI/7;inside.castShadow=false;earGroup.add(inside);
+   if(!root.userData.ears)root.userData.ears=[];root.userData.ears.push(earGroup);
+   ball(.15,muzzleCoat,side*.13,-.19,-.37,neck,[1.15,.7,.76]);
+  }
+  const kittyNose=ball(.08,furPink,0,-.16,-.49,neck,[1.15,.75,.7]);kittyNose.rotation.z=.1;
+  // Three faint whiskers on each cheek, curved gently towards the sides.
+  const whiskerMat=new THREE.MeshBasicMaterial({color:kind===0?0xf7f1e6:0xdddce3});
+  for(const side of [-1,1])for(let w=0;w<3;w++){
+   const p1=new THREE.Vector3(side*.16,-.21+w*.055,-.49),p2=new THREE.Vector3(side*(.49+w*.035),-.19+(w-1)*.09,-.42);
+   const curve=new THREE.LineCurve3(p1,p2),hair=new THREE.Mesh(new THREE.TubeGeometry(curve,4,.008,3,false),whiskerMat);
+   hair.castShadow=false;neck.add(hair);
+  }
+ }
+ // Large glossy eyes use their own pivots so the animals can blink.
+ root.userData.eyes=[];
  for(const side of [-1,1]){
-  const insert=new THREE.Mesh(new THREE.ConeGeometry(.095,.20,4),earPink);
-  insert.position.set(side*.24,1.4,-.57);insert.rotation.y=Math.PI/4;root.add(insert);
-  ball(.105,kind===0?white:grey,side*.11,.95,-.77,root,[1.1,.68,.55]);
+  const eyeGroup=new THREE.Group();eyeGroup.position.set(side*.19,.15,isDog?-.34:-.36);neck.add(eyeGroup);
+  ball(.145,furWhite,0,0,0,eyeGroup,[.83,1.08,.48]);
+  const iris=kind===0?furMint:kind===1?furGold:kind===2?furHazel:furGold;
+  ball(.106,iris,0,-.005,-.065,eyeGroup,[.87,1.08,.46]);
+  ball(.070,furNose,0,-.005,-.111,eyeGroup,[.8,1.12,.43]);
+  const sparkle=ball(.034,pureGlint,-.033,.048,-.141,eyeGroup);sparkle.castShadow=false;
+  const sparkle2=ball(.016,pureGlint,.034,-.031,-.143,eyeGroup);sparkle2.castShadow=false;
+  root.userData.eyes.push(eyeGroup);
  }
+ // Delicate smiling muzzle and friendly blush.
+ for(const side of [-1,1]){
+  const cheek=ball(.083,kind===0?furWhite:kind===3?furCream:headCoat,side*.17,-.245,isDog?-.53:-.39,neck,[1.1,.67,.54]);
+  cheek.castShadow=false;
+  const blush=ball(.06,kind===2?furHazel:furRose,side*.37,-.155,-.23,neck,[.9,.42,.25]);blush.castShadow=false;
+ }
+ if(kind===0){ball(.12,furWhite,0,.28,-.39,neck,[.8,.6,.3])}
+ // Collars and tiny brass tags distinguish each member of the team.
+ const collarMat=[collarBlue,collarPink,collarGold,collarBlue][kind];
+ const collar=new THREE.Mesh(new THREE.TorusGeometry(.35,.055,9,24),collarMat);
+ collar.rotation.x=Math.PI/2;collar.position.set(0,.96,-.34);root.add(collar);
+ const tag=ball(.105,collarGold,0,.83,-.65,root,[.92,1.1,.4]);tag.castShadow=false;
+ const legs=[];
+ for(const x of [-.31,.31])for(const z of [-.26,.48]){
+  const limb=ball(.16,coat,x,.31,z,root,[.9,1.34,.97]);
+  const pawColor=kind===0?furWhite:coat;
+  const paw=ball(.18,pawColor,x,.13,z-.075,root,[1.04,.55,1.32]);
+  for(const toe of [-1,0,1]){const detail=ball(.025,kind===0?furCream:kind===1?furMuzzle:kind===2?furMuzzle:furCream,x+toe*.09,.116,z-.22,root,[.9,.45,.35]);detail.castShadow=false}
+  legs.push({leg:limb,paw,x,z});
+ }
+ // A three-segment rounded tail swings around a proper hip joint.
+ const tail=new THREE.Group();tail.position.set(0,.79,isDog?.96:.78);root.add(tail);
+ for(let j=0;j<3;j++)ball(.14-j*.015,coat,0,.09+j*.06,.16+j*.23,tail,[1,1.05,1.5]);
+ tail.rotation.x=-.45;
+ root.userData.tail=tail;root.userData.legs=legs;root.userData.head=neck;root.userData.headBaseY=neck.position.y;
+ root.position.set(0,0,9);scene.add(root);return root;
 }
-const legs=[];for(let x of [-.28,.28])for(let z of [-.22,.4]){
- const leg=ball(.13,coat,x,.27,z,root,[1,1.8,1]);
- const paw=ball(.14,kind===0?white:coat,x,.12,z-.07,root,[1.14,.53,1.25]);
- legs.push({leg,paw,x,z});
-}
-let tail=ball(.11,coat,0,.79,isDog?.93:.72,root,[.8,.8,isDog?2.2:2.6]);tail.rotation.x=-.45;root.userData.tail=tail;root.userData.legs=legs;root.userData.head=head;root.userData.headBaseY=head.position.y;root.position.set(0,0,9);scene.add(root);return root}
 for(let i=0;i<4;i++)pets.push(pet(i));let active=0;const switcher=document.getElementById('switcher');names.forEach((n,i)=>{let b=document.createElement('button');b.textContent=['🐈‍⬛','🐈','🐕‍🦺','🦮'][i]+' '+n;b.onclick=()=>switchPet(i);switcher.appendChild(b)});
 let position=new THREE.Vector3(0,0,9),velocityY=0,grounded=true,jumps=0,score=0,started=false,won=false,completed=[false,false,false,false],keys=new Set(),joy={x:0,y:0},time=0,moveIntensity=0,lastPawAt=-100,pawStreak=0;const hud=document.getElementById('message');function say(s){hud.textContent=s;hud.classList.remove('pop');void hud.offsetWidth;hud.classList.add('pop')}function switchPet(i){
  if(started&&!grounded){say('Land before switching pets!');return}
- pets.forEach(p=>p.scale.y=1);
+ pets.forEach(p=>p.scale.y=p.userData.baseScale);
  active=i;document.querySelectorAll('#switcher button').forEach((b,j)=>b.classList.toggle('active',j===i));document.getElementById('who').textContent=names[i];document.getElementById('ability').textContent=i===1?'CROUCH':i===3?'DIG':'AUTO';document.getElementById('ability').style.opacity=(i===1||i===3)?'1':'.45';say(names[i]+' — '+descs[i]);pets.forEach((p,j)=>p.visible=j===i)}switchPet(0);
 function updateProgress(){
  const labels=['Cracker','Charlie','Aurelia','Bonnie'];
@@ -356,7 +422,7 @@ function tickChallenges(dt){
    const p=scent[scentProgress];
    if(Math.hypot(position.x-p.position.x,position.z-p.position.z)<.8){scentProgress++;say('Bonnie tracked '+scentProgress+'/'+scent.length+' scent clues!')}
  }
- pets[active].scale.y=active===1&&time<crawlUntil?.65:1;
+ pets[active].scale.y=pets[active].userData.baseScale*(active===1&&time<crawlUntil?.65:1);
  scent.forEach((p,i)=>p.visible=active===3&&completed[2]&&i>=scentProgress);
 }
 function near(x,z,d=2){return Math.hypot(position.x-x,position.z-z)<d}
@@ -488,6 +554,9 @@ document.getElementById('panel').innerHTML='<h1>🌼 The Garden is Saved!</h1><h
  p.userData.tail.rotation.x=-.45+Math.sin(time*(i>=2?7:5)+i)*(.22+.2*energy);
  p.userData.head.position.y=p.userData.headBaseY+Math.sin(time*2.4+i)*.012;
  p.userData.head.rotation.z=Math.sin(time*1.9+i)*.025;
+ p.userData.ears.forEach((ear,k)=>ear.rotation.z=(k?1:-1)*(.12+Math.sin(time*2.3+i+k)*.045));
+ p.userData.eyes.forEach(eye=>{const blink=Math.abs(Math.sin(time*.68+i*1.72))>.997?.16:1;eye.scale.y=blink});
+ p.userData.tail.rotation.y=Math.sin(time*(i>=2?7:4)+i)*(.15+.19*energy);
  p.userData.legs.forEach((part,j)=>{
   const stride=Math.sin(time*(i===2?10:13)+(j===0||j===3?0:Math.PI))*.065*energy;
   part.leg.position.z=part.z+stride;part.paw.position.z=part.z-.07+stride;
